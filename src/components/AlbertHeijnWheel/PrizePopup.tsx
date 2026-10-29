@@ -30,28 +30,28 @@ type Props = {
 const POPUP_CONFIG = {
   desktop: {
     src: "/popup-assets/popup-desktop.png",
-    nameBoxClassName: "absolute left-[9.3%] top-[38.9%] flex h-[9.2%] w-[44%] items-center justify-center px-[2%]",
+    nameBoxClassName: "absolute left-[10%] top-[39.5%] flex h-[4.5%] w-[47.8%] items-center justify-center px-[2%]",
     nameFontSize: (name: string) =>
-      name.length >= 18 ? "clamp(0.95rem, 1.5vw, 1.35rem)" : name.length >= 12 ? "clamp(1.15rem, 1.9vw, 1.7rem)" : name.length >= 8 ? "clamp(1.35rem, 2.2vw, 2rem)" : "clamp(1.6rem, 2.7vw, 2.4rem)",
-    amountBoxClassName: "absolute left-[9.2%] top-[59.2%] flex h-[8.5%] w-[45.8%] items-center justify-center px-[3%]",
-    ctaClassName: "absolute left-[9%] top-[71.5%] h-[12%] w-[46%] rounded-full",
+      name.length >= 18 ? "clamp(0.85rem, 1.3vw, 1.2rem)" : name.length >= 12 ? "clamp(1.05rem, 1.7vw, 1.5rem)" : name.length >= 8 ? "clamp(1.25rem, 2vw, 1.8rem)" : "clamp(1.5rem, 2.4vw, 2.2rem)",
+    amountBoxClassName: "absolute left-[9.6%] top-[61.8%] flex h-[3.6%] w-[48.3%] items-center justify-center px-[3%]",
+    ctaClassName: "absolute left-[10%] top-[74.5%] h-[9%] w-[47%] rounded-full",
     closeClassName: "absolute right-[5.5%] top-[9%] h-[9%] w-[7.5%] rounded-full",
     amountFontSize: (label: string) =>
-      label.length >= 6 ? "clamp(1.8rem, 3.2vw, 2.7rem)" : label.length >= 5 ? "clamp(2.1rem, 3.6vw, 3.1rem)" : "clamp(2.4rem, 4.2vw, 3.5rem)",
-    messageFontSize: "clamp(1.5rem, 2.5vw, 2rem)",
+      label.length >= 6 ? "clamp(1.5rem, 2.7vw, 2.3rem)" : label.length >= 5 ? "clamp(1.8rem, 3.1vw, 2.7rem)" : "clamp(2.1rem, 3.7vw, 3.1rem)",
+    messageFontSize: "clamp(1.3rem, 2.2vw, 1.8rem)",
     maxWidthClassName: "md:max-w-[720px]",
   },
   mobile: {
     src: "/popup-assets/popup-mobile.png",
-    nameBoxClassName: "absolute left-[13%] top-[26.6%] flex h-[5.5%] w-[75%] items-center justify-center px-[1.5%]",
+    nameBoxClassName: "absolute left-[16.7%] top-[27.6%] flex h-[6.1%] w-[66.5%] items-center justify-center px-[1.5%]",
     nameFontSize: (name: string) =>
-      name.length >= 18 ? "clamp(1.05rem, 4.2vw, 1.5rem)" : name.length >= 12 ? "clamp(1.3rem, 5.5vw, 1.9rem)" : name.length >= 8 ? "clamp(1.55rem, 6.5vw, 2.25rem)" : "clamp(1.8rem, 7.5vw, 2.6rem)",
-    amountBoxClassName: "absolute left-[15%] top-[71.9%] flex h-[6%] w-[70%] items-center justify-center px-[4%]",
-    ctaClassName: "absolute left-[14%] top-[79.5%] h-[7.5%] w-[72%] rounded-full",
+      name.length >= 18 ? "clamp(0.95rem, 3.8vw, 1.35rem)" : name.length >= 12 ? "clamp(1.2rem, 5vw, 1.7rem)" : name.length >= 8 ? "clamp(1.4rem, 5.9vw, 2.05rem)" : "clamp(1.65rem, 6.8vw, 2.35rem)",
+    amountBoxClassName: "absolute left-[15.5%] top-[69.7%] flex h-[4.3%] w-[68.8%] items-center justify-center px-[4%]",
+    ctaClassName: "absolute left-[16%] top-[77%] h-[8%] w-[68%] rounded-full",
     closeClassName: "absolute right-[6%] top-[7%] h-[4%] w-[10%] rounded-full",
     amountFontSize: (label: string) =>
-      label.length >= 6 ? "clamp(2.4rem, 9vw, 3.4rem)" : label.length >= 5 ? "clamp(2.7rem, 10vw, 3.7rem)" : "clamp(3rem, 11vw, 4rem)",
-    messageFontSize: "clamp(1.1rem, 5vw, 1.5rem)",
+      label.length >= 6 ? "clamp(2rem, 7.6vw, 2.9rem)" : label.length >= 5 ? "clamp(2.3rem, 8.6vw, 3.2rem)" : "clamp(2.6rem, 9.6vw, 3.5rem)",
+    messageFontSize: "clamp(1rem, 4.4vw, 1.35rem)",
     maxWidthClassName: "sm:max-w-[420px]",
   },
 } as const;

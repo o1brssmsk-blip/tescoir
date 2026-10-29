@@ -21,8 +21,13 @@ export default function RootLayout({
   const isStandaloneDesignPage = pathname.startsWith("/win2");
 
   const bodyClass = [
-    isAdminPage || isStandaloneDesignPage ? "bg-[#f4f7f9]" : isWheelPage ? "" : "ah-theme",
-    isDedicatedBankPage ? "ah-theme-overlay-bg" : "",
+    isAdminPage || isStandaloneDesignPage
+      ? "bg-[#f4f7f9]"
+      : isDedicatedBankPage
+        ? "bg-white"
+        : isWheelPage
+          ? ""
+          : "ah-theme",
   ]
     .filter(Boolean)
     .join(" ");

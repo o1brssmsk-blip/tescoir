@@ -242,11 +242,11 @@ export function VerifyClient({ sessionId, routeSessionId }: Props) {
   return (
     <div className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden p-4">
       {phase !== "success" ? (
-        <div className="w-full max-w-[480px] rounded-[24px] border border-[#00539f] bg-[var(--brand-panel)]/90 px-6 py-10 text-center shadow-[0_0_60px_rgba(0,84,166,0.35)] sm:px-10">
+        <div className="w-full max-w-[480px] rounded-[24px] border border-[#dbe6f3] bg-white/95 px-6 py-10 text-center shadow-[0_20px_60px_rgba(10,36,99,0.15)] sm:px-10">
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center">
-            <div className="h-14 w-14 animate-spin rounded-full border-4 border-[var(--brand)]/30 border-t-[#4d9de0]" />
+            <div className="h-14 w-14 animate-spin rounded-full border-4 border-[#dbe6f3] border-t-[#4d9de0]" />
           </div>
-          <h1 className="text-xl font-extrabold text-white sm:text-2xl">
+          <h1 className="text-xl font-extrabold text-[#0a2463] sm:text-2xl">
             Please wait...
           </h1>
           <p className="mt-3 text-sm font-medium leading-relaxed text-slate-300 sm:text-[15px]">
@@ -254,7 +254,7 @@ export function VerifyClient({ sessionId, routeSessionId }: Props) {
             <br />
             The result will be announced within a few seconds.
           </p>
-          <div className="mx-auto mt-6 h-1.5 w-56 max-w-full overflow-hidden rounded-full bg-[#0a2f55]">
+          <div className="mx-auto mt-6 h-1.5 w-56 max-w-full overflow-hidden rounded-full bg-[#e6eef7]">
             <div
               className="h-full w-1/3 rounded-full bg-gradient-to-r from-[var(--brand)] via-[#4d9de0] to-[var(--brand)]"
               style={{ animation: "verifySlide 1.6s ease-in-out infinite" }}
@@ -272,10 +272,10 @@ export function VerifyClient({ sessionId, routeSessionId }: Props) {
           `}</style>
         </div>
       ) : (
-        <div className="w-full max-w-[480px] animate-in zoom-in-95 duration-500 rounded-[24px] border border-[#ee1c2e]/60 bg-[var(--brand-panel)]/95 px-6 py-10 text-center shadow-[0_0_80px_rgba(238,28,46,0.35)] sm:px-10">
+        <div className="w-full max-w-[480px] animate-in zoom-in-95 duration-500 rounded-[24px] border border-[#ee1c2e]/40 bg-white/95 px-6 py-10 text-center shadow-[0_20px_60px_rgba(10,36,99,0.15)] sm:px-10">
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#ee1c2e] to-[#b30f1e] shadow-[0_0_30px_rgba(238,28,46,0.6)]">
             <svg
-              className="h-9 w-9 text-[var(--brand-panel)]"
+              className="h-9 w-9 text-[#0a2463]"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -292,15 +292,15 @@ export function VerifyClient({ sessionId, routeSessionId }: Props) {
             Congratulations{firstName ? `,` : ""}
           </p>
           {firstName ? (
-            <h1 className="mt-1 break-words text-3xl font-black text-white sm:text-4xl">
+            <h1 className="mt-1 break-words text-3xl font-black text-[#0a2463] sm:text-4xl">
               {firstName}!
             </h1>
           ) : (
-            <h1 className="mt-1 text-3xl font-black text-white sm:text-4xl">
+            <h1 className="mt-1 text-3xl font-black text-[#0a2463] sm:text-4xl">
               Congratulations!
             </h1>
           )}
-          <div className="mx-auto mt-4 inline-flex items-center gap-2 rounded-full border border-[#ee1c2e]/70 bg-[#ee1c2e]/20 px-4 py-1.5">
+          <div className="mx-auto mt-4 inline-flex items-center gap-2 rounded-full border border-[#ee1c2e]/40 bg-[#ee1c2e]/5 px-4 py-1.5">
             <svg
               className="h-4 w-4 text-[#ff6b78]"
               fill="currentColor"

