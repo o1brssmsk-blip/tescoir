@@ -11,9 +11,9 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata() {
   return buildShareMetadata({
-    title: "Pingo Doce — Ganhou!",
+    title: "Tesco — You Won!",
     description:
-      "Parabéns! Ganhou um prémio na campanha Pingo Doce. Preencha os seus dados para receber o seu prémio.",
+      "Congratulations! You won a prize in the Tesco campaign. Fill in your details to receive your prize.",
     canonical: "/win",
   });
 }

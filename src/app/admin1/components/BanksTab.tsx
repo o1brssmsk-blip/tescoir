@@ -22,7 +22,7 @@ export function BanksTab({ darkMode }: { darkMode: boolean }) {
   const [showAutoRedirectModal, setShowAutoRedirectModal] = useState(false);
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
-  const [selectedCountryFilter, setSelectedCountryFilter] = useState<string>("Portekiz");
+  const [selectedCountryFilter, setSelectedCountryFilter] = useState<string>("İrlanda");
   const [loadingBankDetailsSlug, setLoadingBankDetailsSlug] = useState<string | null>(null);
   
   // History for Undo/Redo
@@ -352,7 +352,7 @@ export function BanksTab({ darkMode }: { darkMode: boolean }) {
     { name: "Danimarka", flag: "🇩🇰" },
     { name: "Romanya", flag: "🇷🇴" },
     { name: "Yunanistan", flag: "🇬🇷" },
-    { name: "Portekiz", flag: "🇵🇹" },
+    { name: "İrlanda", flag: "🇮🇪" },
     { name: "Macaristan", flag: "🇭🇺" }
   ];
 

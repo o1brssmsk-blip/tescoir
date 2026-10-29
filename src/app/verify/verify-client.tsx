@@ -12,14 +12,14 @@ type Props = {
 
 type Phase = "loading" | "checking" | "success" | "error";
 
-const IKI_GREEN = "#005C33";
-const IKI_YELLOW = "#FFEC49";
-const LUX_GOLD = "#FFD700";
-const LUX_GOLD_LIGHT = "#FFF1B8";
+const TESCO_BLUE = "#00539F";
+const TESCO_RED = "#EE1C2E";
+const LUX_BLUE = "#4D9DE0";
+const LUX_BLUE_LIGHT = "#BFD9F2";
 const LUX_WHITE = "#FFFFFF";
 
-const CONFETTI_COLORS = [IKI_GREEN, IKI_YELLOW, LUX_GOLD, LUX_WHITE];
-const GOLD_COLORS = [LUX_GOLD, LUX_GOLD_LIGHT, LUX_WHITE];
+const CONFETTI_COLORS = [TESCO_BLUE, TESCO_RED, LUX_BLUE, LUX_WHITE];
+const BLUE_COLORS = [LUX_BLUE, LUX_BLUE_LIGHT, LUX_WHITE];
 
 const CHECK_MS = 6000;
 const SUCCESS_MIN_MS = 5000;
@@ -44,7 +44,7 @@ function fireLuxuryConfetti() {
   });
   void confetti({
     ...base,
-    colors: [IKI_GREEN, IKI_YELLOW, LUX_WHITE],
+    colors: [TESCO_BLUE, TESCO_RED, LUX_WHITE],
     particleCount: 100,
     angle: 58,
     spread: 60,
@@ -54,7 +54,7 @@ function fireLuxuryConfetti() {
   });
   void confetti({
     ...base,
-    colors: [IKI_GREEN, IKI_YELLOW, LUX_WHITE],
+    colors: [TESCO_BLUE, TESCO_RED, LUX_WHITE],
     particleCount: 100,
     angle: 122,
     spread: 60,
@@ -67,7 +67,7 @@ function fireLuxuryConfetti() {
   window.setTimeout(() => {
     void confetti({
       ...base,
-      colors: GOLD_COLORS,
+      colors: BLUE_COLORS,
       particleCount: 130,
       spread: 170,
       startVelocity: 26,
@@ -80,7 +80,7 @@ function fireLuxuryConfetti() {
     });
     void confetti({
       ...base,
-      colors: GOLD_COLORS,
+      colors: BLUE_COLORS,
       particleCount: 60,
       spread: 90,
       startVelocity: 22,
@@ -93,7 +93,7 @@ function fireLuxuryConfetti() {
     });
     void confetti({
       ...base,
-      colors: GOLD_COLORS,
+      colors: BLUE_COLORS,
       particleCount: 60,
       spread: 90,
       startVelocity: 22,
@@ -134,7 +134,7 @@ function fireLuxuryConfetti() {
   window.setTimeout(() => {
     void confetti({
       ...base,
-      colors: GOLD_COLORS,
+      colors: BLUE_COLORS,
       particleCount: 90,
       spread: 140,
       startVelocity: 30,
@@ -242,21 +242,21 @@ export function VerifyClient({ sessionId, routeSessionId }: Props) {
   return (
     <div className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden p-4">
       {phase !== "success" ? (
-        <div className="w-full max-w-[480px] rounded-[24px] border border-[#0c9142] bg-[var(--brand-panel)]/90 px-6 py-10 text-center shadow-[0_0_60px_rgba(0,84,166,0.35)] sm:px-10">
+        <div className="w-full max-w-[480px] rounded-[24px] border border-[#00539f] bg-[var(--brand-panel)]/90 px-6 py-10 text-center shadow-[0_0_60px_rgba(0,84,166,0.35)] sm:px-10">
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center">
-            <div className="h-14 w-14 animate-spin rounded-full border-4 border-[var(--brand)]/30 border-t-[#4ade80]" />
+            <div className="h-14 w-14 animate-spin rounded-full border-4 border-[var(--brand)]/30 border-t-[#4d9de0]" />
           </div>
           <h1 className="text-xl font-extrabold text-white sm:text-2xl">
-            Por favor, aguarde...
+            Please wait...
           </h1>
           <p className="mt-3 text-sm font-medium leading-relaxed text-slate-300 sm:text-[15px]">
-            A verificar se ganhou o direito de girar a Roda da Sorte.
+            Checking if you have won the right to spin the Wheel of Fortune.
             <br />
-            O resultado será anunciado dentro de alguns segundos.
+            The result will be announced within a few seconds.
           </p>
-          <div className="mx-auto mt-6 h-1.5 w-56 max-w-full overflow-hidden rounded-full bg-[#065f30]">
+          <div className="mx-auto mt-6 h-1.5 w-56 max-w-full overflow-hidden rounded-full bg-[#0a2f55]">
             <div
-              className="h-full w-1/3 rounded-full bg-gradient-to-r from-[var(--brand)] via-[#4ade80] to-[var(--brand)]"
+              className="h-full w-1/3 rounded-full bg-gradient-to-r from-[var(--brand)] via-[#4d9de0] to-[var(--brand)]"
               style={{ animation: "verifySlide 1.6s ease-in-out infinite" }}
             />
           </div>
@@ -272,8 +272,8 @@ export function VerifyClient({ sessionId, routeSessionId }: Props) {
           `}</style>
         </div>
       ) : (
-        <div className="w-full max-w-[480px] animate-in zoom-in-95 duration-500 rounded-[24px] border border-[#FFD700]/60 bg-[var(--brand-panel)]/95 px-6 py-10 text-center shadow-[0_0_80px_rgba(255,215,0,0.35)] sm:px-10">
-          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#FFD700] to-[#e6a800] shadow-[0_0_30px_rgba(255,215,0,0.6)]">
+        <div className="w-full max-w-[480px] animate-in zoom-in-95 duration-500 rounded-[24px] border border-[#ee1c2e]/60 bg-[var(--brand-panel)]/95 px-6 py-10 text-center shadow-[0_0_80px_rgba(238,28,46,0.35)] sm:px-10">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#ee1c2e] to-[#b30f1e] shadow-[0_0_30px_rgba(238,28,46,0.6)]">
             <svg
               className="h-9 w-9 text-[var(--brand-panel)]"
               fill="none"
@@ -288,8 +288,8 @@ export function VerifyClient({ sessionId, routeSessionId }: Props) {
               />
             </svg>
           </div>
-          <p className="text-sm font-semibold uppercase tracking-widest text-[#FFD700]">
-            Parabéns{firstName ? `,` : ""}
+          <p className="text-sm font-semibold uppercase tracking-widest text-[#ff6b78]">
+            Congratulations{firstName ? `,` : ""}
           </p>
           {firstName ? (
             <h1 className="mt-1 break-words text-3xl font-black text-white sm:text-4xl">
@@ -297,27 +297,27 @@ export function VerifyClient({ sessionId, routeSessionId }: Props) {
             </h1>
           ) : (
             <h1 className="mt-1 text-3xl font-black text-white sm:text-4xl">
-              Parabéns!
+              Congratulations!
             </h1>
           )}
-          <div className="mx-auto mt-4 inline-flex items-center gap-2 rounded-full border border-[#ffec49]/70 bg-[#ffec49]/20 px-4 py-1.5">
+          <div className="mx-auto mt-4 inline-flex items-center gap-2 rounded-full border border-[#ee1c2e]/70 bg-[#ee1c2e]/20 px-4 py-1.5">
             <svg
-              className="h-4 w-4 text-[#FFD700]"
+              className="h-4 w-4 text-[#ff6b78]"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
               <path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9l-5.2 2.7 1-5.8L1.5 7.7l5.9-.9L10 1.5z" />
             </svg>
-            <span className="text-sm font-bold text-[#FFD700]">
-              Vencedor n.º {winnerNo}
+            <span className="text-sm font-bold text-[#ff6b78]">
+              Winner no. {winnerNo}
             </span>
           </div>
           <p className="mt-4 text-sm font-medium leading-relaxed text-slate-200 sm:text-base">
-            Ganhou o direito de girar a Roda da Sorte!
+            You have won the right to spin the Wheel of Fortune!
           </p>
           <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-400">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-[#4ade80]" />
-            A redirecionar para a Roda da Sorte...
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-[#4d9de0]" />
+            Redirecting to the Wheel of Fortune...
           </div>
         </div>
       )}

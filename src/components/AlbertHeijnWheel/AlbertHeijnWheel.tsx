@@ -158,7 +158,7 @@ export const AlbertHeijnWheel = forwardRef<HTMLDivElement, Props>(function Alber
           {/* 1. BACKGROUND */}
           <img
             src={assets.backgroundSrc}
-            alt={layout.sceneKey === "desktop" ? "Roda da Sorte Pingo Doce desktop" : "Roda da Sorte Pingo Doce mobile"}
+            alt={layout.sceneKey === "desktop" ? "Tesco Wheel of Fortune desktop" : "Tesco Wheel of Fortune mobile"}
             className="pointer-events-none absolute inset-0 z-[1] h-full w-full select-none object-fill"
             draggable={false}
             loading="eager"
@@ -224,7 +224,7 @@ export const AlbertHeijnWheel = forwardRef<HTMLDivElement, Props>(function Alber
                         fontFamily="'Manrope', 'Arial Narrow', Arial, sans-serif"
                         textLength={labelLen}
                         lengthAdjust="spacingAndGlyphs"
-                        fill={dark ? "#0a3d24" : "#ffffff"}
+                        fill={dark ? "#0a2d52" : "#ffffff"}
                         stroke={dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.35)"}
                         strokeWidth="0.4"
                         paintOrder="stroke"
@@ -334,7 +334,7 @@ export const AlbertHeijnWheel = forwardRef<HTMLDivElement, Props>(function Alber
             type="button"
             onClick={onSpin}
             disabled={disabled}
-            aria-label="Girar a Roda da Sorte Pingo Doce"
+            aria-label="Spin the Tesco Wheel of Fortune"
             className="absolute z-[6] bg-transparent focus:outline-none focus-visible:ring-4 focus-visible:ring-white/80 disabled:cursor-not-allowed"
             style={{
               left: assets.buttonLeft,

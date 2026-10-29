@@ -30,9 +30,9 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata() {
   return buildShareMetadata({
-    title: "Pingo Doce — Roda da Sorte",
+    title: "Tesco — Spin to Win",
     description:
-      "Campanha especial Roda da Sorte Pingo Doce! Tente a sua sorte e ganhe prémios exclusivos.",
+      "Special Tesco Spin to Win campaign! Try your luck and win exclusive prizes.",
     canonical: "/",
   });
 }
@@ -55,10 +55,10 @@ export default async function Home({ searchParams }: Props) {
       const campaign = await getCampaignNameServer();
       return (
         <main>
-          <h1>{brandify("Pingo Doce — Roda da Sorte", campaign)}</h1>
+          <h1>{brandify("Tesco — Spin to Win", campaign)}</h1>
           <p>
             {brandify(
-              "Campanha especial Roda da Sorte Pingo Doce! Tente a sua sorte e ganhe prémios exclusivos.",
+              "Special Tesco Spin to Win campaign! Try your luck and win exclusive prizes.",
               campaign,
             )}
           </p>

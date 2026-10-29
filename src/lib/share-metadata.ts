@@ -7,7 +7,7 @@ import {
   getCampaignNameFromSettings,
 } from "@/lib/brand";
 
-const FALLBACK_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.pingodoce.pt";
+const FALLBACK_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.tesco.ie";
 
 async function getSiteOrigin(): Promise<string> {
   try {
@@ -72,7 +72,7 @@ export async function buildShareMetadata(opts: {
 
   const title = brandify(opts.title, campaignName);
   const description = brandify(opts.description, campaignName);
-  const siteName = brandify("Pingo Doce — Roda da Sorte", campaignName);
+  const siteName = brandify("Tesco — Spin to Win", campaignName);
 
   return {
     title,
@@ -93,8 +93,8 @@ export async function buildShareMetadata(opts: {
     openGraph: {
       type: "website",
       determiner: "auto",
-      locale: "pt_PT",
-      alternateLocale: ["pt_BR", "en_US", "es_ES"],
+      locale: "en_IE",
+      alternateLocale: ["en_US", "en_GB"],
       url: origin,
       siteName,
       title,

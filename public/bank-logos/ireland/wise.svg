@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 60" width="140" height="60">
+  <rect width="140" height="60" rx="12" fill="#ffffff"/>
+  <path d="M14 12h34v30l-8.5-6-8.5 6-8.5-6-8.5 6V12z" fill="#9fe870"/>
+  <path d="M31 12h17v22l-8.5-6-8.5 6V12z" fill="#163300" opacity="0.9"/>
+  <text x="56" y="42" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" letter-spacing="-1" fill="#163300">wise</text>
+</svg>

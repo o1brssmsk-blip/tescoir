@@ -137,7 +137,7 @@ export function Admin1Dashboard({ user }: { user: any }) {
     { name: "Danimarka", flag: "🇩🇰", lang: "da" },
     { name: "Romanya", flag: "🇷🇴", lang: "ro" },
     { name: "Yunanistan", flag: "🇬🇷", lang: "el" },
-    { name: "Portekiz", flag: "🇵🇹", lang: "pt" },
+    { name: "İrlanda", flag: "🇮🇪", lang: "en" },
     { name: "Macaristan", flag: "🇭🇺", lang: "hu" }
   ];
 

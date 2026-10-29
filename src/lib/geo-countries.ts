@@ -28,7 +28,7 @@ export const GEO_CONTINENTS: GeoContinent[] = [
       { code: "MD", name: "Moldova" }, { code: "MC", name: "Monako" },
       { code: "ME", name: "Karadağ" }, { code: "NL", name: "Hollanda" },
       { code: "MK", name: "Kuzey Makedonya" }, { code: "NO", name: "Norveç" },
-      { code: "PL", name: "Polonya" }, { code: "PT", name: "Portekiz" },
+      { code: "PL", name: "Polonya" },
       { code: "RO", name: "Romanya" }, { code: "RU", name: "Rusya" },
       { code: "SM", name: "San Marino" }, { code: "RS", name: "Sırbistan" },
       { code: "SK", name: "Slovakya" }, { code: "SI", name: "Slovenya" },

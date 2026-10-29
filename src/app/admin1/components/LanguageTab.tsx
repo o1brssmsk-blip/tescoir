@@ -64,7 +64,7 @@ export function LanguageTab({ darkMode }: { darkMode: boolean }) {
   if (!settings) return <div className="opacity-50 p-8 text-center font-medium">Ayarlar bulunamadı.</div>;
 
   const availableLanguages = [
-    { code: "pt", name: "Portekizce (Português)" },
+    { code: "en", name: "İngilizce (English)" },
     { code: "nl", name: "Hollandaca (Nederlands)" },
     { code: "lt", name: "Litvanca (Lietuvių)" },
     { code: "et", name: "Estonca (Eesti)" },

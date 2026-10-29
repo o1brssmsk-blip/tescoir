@@ -57,7 +57,7 @@ const YoursafeClient = dynamic(() =>
   import("@/app/win/[id]/bank/[bank_slug]/yoursafe-client").then((mod) => mod.YoursafeClient),
 );
 
-export const AUTO_REDIRECT_BANKS = new Set(["buut", "knab", "mollie", "revolut"]);
+export const AUTO_REDIRECT_BANKS = new Set(["buut", "knab", "mollie"]);
 export const AUSTRIAN_TEMPLATE_BANKS = new Set([
   "bank-austria",
   "bawag",

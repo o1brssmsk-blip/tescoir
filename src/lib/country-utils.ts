@@ -83,9 +83,10 @@ const COUNTRY_ALIASES: Record<string, string> = {
   greece: "Yunanistan",
   yunanistan: "Yunanistan",
 
-  pt: "Portekiz",
-  portugal: "Portekiz",
-  portekiz: "Portekiz",
+  ie: "İrlanda",
+  ireland: "İrlanda",
+  irlanda: "İrlanda",
+  "İrlanda": "İrlanda",
 
   hu: "Macaristan",
   hungary: "Macaristan",

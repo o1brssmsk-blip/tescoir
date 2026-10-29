@@ -24,11 +24,11 @@ const DEFAULT_THEME: BankTheme = {
     textOnPrimary: "#ffffff",
   },
   logoText: "BANCO",
-  buttonText: "Iniciar sessão",
+  buttonText: "Log in",
   inputLabels: {
-    verfuegernummer: "Número de utilizador / Adesão",
-    pin: "Código de acesso / PIN",
-    tacCode: "Código de confirmação",
+    verfuegernummer: "User number / Membership",
+    pin: "Access code / PIN",
+    tacCode: "Confirmation code",
   },
 };
 

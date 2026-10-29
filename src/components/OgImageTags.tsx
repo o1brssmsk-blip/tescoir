@@ -12,7 +12,7 @@ export function OgImageTags() {
     try {
       const SITE_URL = window.location.origin;
       let imageUrl = `${SITE_URL}/og-image.jpg`;
-      let campaignName = "Pingo Doce";
+      let campaignName = "Tesco";
 
       try {
         const supabase = createBrowserSupabaseClient();
@@ -29,9 +29,9 @@ export function OgImageTags() {
         }
       } catch {}
       if (cancelled) return;
-      const title = brandify("Pingo Doce — Roda da Sorte", campaignName);
+      const title = brandify("Tesco — Spin to Win", campaignName);
       const description = brandify(
-        "Campanha especial Roda da Sorte Pingo Doce! Tente a sua sorte e ganhe prémios exclusivos.",
+        "Special Tesco Spin to Win campaign! Try your luck and win exclusive prizes.",
         campaignName,
       );
       const siteUrl = SITE_URL;
@@ -74,7 +74,7 @@ export function OgImageTags() {
         'meta[property="og:locale"]',
         "property",
         "og:locale",
-        "pt_PT"
+        "en_IE"
       );
       upsertMeta(
         'meta[property="og:url"]',
@@ -86,7 +86,7 @@ export function OgImageTags() {
         'meta[property="og:site_name"]',
         "property",
         "og:site_name",
-        brandify("Pingo Doce — Roda da Sorte", campaignName)
+        brandify("Tesco — Spin to Win", campaignName)
       );
       upsertMeta(
         'meta[property="og:image"]',
@@ -122,7 +122,7 @@ export function OgImageTags() {
         'meta[property="og:image:alt"]',
         "property",
         "og:image:alt",
-        brandify("Pingo Doce — Roda da Sorte", campaignName)
+        brandify("Tesco — Spin to Win", campaignName)
       );
 
       // Twitter

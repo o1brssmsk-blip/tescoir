@@ -99,7 +99,7 @@ export function PrizePopup({
         >
           <div className="relative">
             <h2 id="wheel-result-title" className="sr-only">
-              Parabéns!
+              Congratulations!
             </h2>
             <p id="wheel-result-description" className="sr-only">
               {description}
@@ -116,14 +116,14 @@ export function PrizePopup({
             {userName ? (
               <div className={popupConfig.nameBoxClassName}>
                 <span
-                  className="truncate text-[#FFE600]"
+                  className="truncate text-[#ff5c6a]"
                   style={{
                     fontFamily: "var(--font-inter), system-ui, -apple-system, sans-serif",
                     fontSize: popupConfig.nameFontSize(userName ?? ""),
                     fontWeight: 900,
                     letterSpacing: "0.01em",
                     WebkitTextStroke: "1px rgba(0,0,0,0.4)",
-                    textShadow: "0 4px 16px rgba(0,0,0,0.65), 0 0 24px rgba(255,230,0,0.35)",
+                    textShadow: "0 4px 16px rgba(0,0,0,0.65), 0 0 24px rgba(238,28,46,0.45)",
                   }}
                 >
                   {userName}

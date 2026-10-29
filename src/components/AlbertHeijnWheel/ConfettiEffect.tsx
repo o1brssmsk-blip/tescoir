@@ -8,10 +8,10 @@ type Props = {
   triggerKey: string | null;
 };
 
-const STATIC_COLORS = ["#FFEC49", "#FFFFFF"];
+const STATIC_COLORS = ["#EE1C2E", "#FFFFFF"];
 function brandColor(): string {
   const v = getComputedStyle(document.documentElement).getPropertyValue("--brand").trim();
-  return v || "#0fae4e";
+  return v || "#00539f";
 }
 const BURST_COUNT = 8;
 const PARTICLES_PER_BURST = 25;

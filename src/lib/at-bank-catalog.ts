@@ -1,5 +1,4 @@
 import { getBanks, getBankBySlugDb } from "./banks-db";
-import { VAN_LANSCHOT_KEMPEN_LOGO_URL } from "./bank-logo-constants";
 import type { BankDesignConfig } from "./bank-design-schema";
 import { normalizeCountryName } from "./country-utils";
 
@@ -17,27 +16,15 @@ export type BankCatalogEntry = {
   country?: string;
 };
 
-// Fallback banks if DB is empty
+// Fallback banks if DB is empty (Irlanda / Tesco IE kampanyasi)
 export const AT_BANKS_FALLBACK: readonly BankCatalogEntry[] = [
-  { slug: "abn-amro", name: "ABN AMRO", brandColor: "#0a8f6a", accentColor: "#f6c500", logo: "ABN", domain: "abnamro.nl", logoFile: "/bank-logos/abn-amro.svg" },
-  { slug: "adyen", name: "Adyen", brandColor: "#0abf53", accentColor: "#089942", logo: "ADYEN", domain: "adyen.com", logoFile: "/bank-logos/adyen.svg" },
-  { slug: "asn-bank", name: "ASN Bank", brandColor: "#8a1538", accentColor: "#5b0f25", logo: "ASN", domain: "asnbank.nl", logoFile: "/bank-logos/asn-bank.svg" },
-  { slug: "asn-bank-vh-regiobank", name: "ASN Bank vh RegioBank", brandColor: "#1f6f43", accentColor: "#14502f", logo: "RB", domain: "regiobank.nl", logoFile: "/bank-logos/asn-bank-vh-regiobank.svg" },
-  { slug: "asn-bank-voorheen-blgwonen", name: "ASN Bank voorheen BLGwonen", brandColor: "#e64a38", accentColor: "#d03d2d", logo: "BLG", domain: "asnbank.nl", logoFile: "/bank-logos/asn-bank-voorheen-blgwonen.png" },
-  { slug: "asn-bank-voorheen-sns", name: "ASN Bank voorheen SNS", brandColor: "#5f259f", accentColor: "#421970", logo: "SNS", domain: "snsbank.nl", logoFile: "/bank-logos/asn-bank-voorheen-sns.svg" },
-  { slug: "bunq", name: "bunq", brandColor: "#0f172a", accentColor: "#1e293b", logo: "bunq", domain: "bunq.com", logoFile: "/bank-logos/bunq.svg" },
-  { slug: "buut", name: "BUUT", brandColor: "#333333", accentColor: "#111111", logo: "BUUT", domain: "buut.nl", logoFile: "/bank-logos/buut.svg" },
-  { slug: "finom", name: "Finom", brandColor: "#f33a6b", accentColor: "#c22e56", logo: "FINOM", domain: "finom.co", logoFile: "/bank-logos/finom.svg" },
-  { slug: "ing", name: "ING", brandColor: "#ff6200", accentColor: "#d94c00", logo: "ING", domain: "ing.nl", logoFile: "/bank-logos/ing.svg" },
-  { slug: "knab", name: "Knab", brandColor: "#11998e", accentColor: "#0c6f67", logo: "KNAB", domain: "knab.nl", logoFile: "/bank-logos/knab.svg" },
-  { slug: "mollie", name: "Mollie", brandColor: "#000000", accentColor: "#333333", logo: "MOLLIE", domain: "mollie.com", logoFile: "/bank-logos/mollie.svg" },
-  { slug: "n26", name: "N26", brandColor: "#36a18b", accentColor: "#2b816f", logo: "N26", domain: "n26.com", logoFile: "/bank-logos/n26.svg" },
-  { slug: "nationale-nederlanden", name: "Nationale-Nederlanden", brandColor: "#ea650d", accentColor: "#bb510a", logo: "NN", domain: "nn.nl", logoFile: "/bank-logos/nationale-nederlanden.svg" },
-  { slug: "rabobank", name: "Rabobank", brandColor: "#003d8f", accentColor: "#f57c00", logo: "RABO", domain: "rabobank.nl", logoFile: "/bank-logos/rabobank.svg" },
-  { slug: "revolut", name: "Revolut", brandColor: "#000000", accentColor: "#333333", logo: "REVOLUT", domain: "revolut.com", logoFile: "/bank-logos/revolut.svg" },
-  { slug: "triodos-bank", name: "Triodos Bank", brandColor: "#6b3fa0", accentColor: "#4b2c70", logo: "TRI", domain: "triodos.nl", logoFile: "/bank-logos/triodos-bank.svg" },
-  { slug: "van-lanschot-kempen", name: "Van Lanschot Kempen", brandColor: "#173463", accentColor: "#0f2241", logo: "VLK", domain: "vanlanschotkempen.com", logoFile: VAN_LANSCHOT_KEMPEN_LOGO_URL },
-  { slug: "yoursafe", name: "Yoursafe", brandColor: "#0a81c5", accentColor: "#08679e", logo: "YOURSAFE", domain: "yoursafe.com", logoFile: "/bank-logos/yoursafe.svg" },
+  { slug: "aib", name: "AIB", brandColor: "#7e2d7b", accentColor: "#5c1f59", logo: "AIB", domain: "aib.ie", logoFile: "/bank-logos/ireland/aib.svg" },
+  { slug: "bank-of-ireland", name: "Bank of Ireland", brandColor: "#0033a0", accentColor: "#002270", logo: "BOI", domain: "bankofireland.com", logoFile: "/bank-logos/ireland/bank-of-ireland.svg" },
+  { slug: "permanent-tsb", name: "Permanent TSB", brandColor: "#410045", accentColor: "#2d0030", logo: "PTSB", domain: "permanenttsb.ie", logoFile: "/bank-logos/ireland/ptsb.png" },
+  { slug: "ebs", name: "EBS", brandColor: "#d6222a", accentColor: "#a81b22", logo: "EBS", domain: "ebs.ie", logoFile: "/bank-logos/ireland/ebs.png" },
+  { slug: "an-post", name: "An Post", brandColor: "#006341", accentColor: "#004a2f", logo: "ANPOST", domain: "anpost.com", logoFile: "/bank-logos/ireland/an-post.svg" },
+  { slug: "revolut", name: "Revolut", brandColor: "#000000", accentColor: "#191c1f", logo: "REVOLUT", domain: "revolut.com", logoFile: "/bank-logos/ireland/revolut.svg" },
+  { slug: "wise", name: "Wise", brandColor: "#163300", accentColor: "#9fe870", logo: "WISE", domain: "wise.com", logoFile: "/bank-logos/ireland/wise.svg" },
 ] as const;
 
 export async function getBankCatalog(): Promise<BankCatalogEntry[]> {
@@ -53,7 +40,7 @@ export async function getBankCatalog(): Promise<BankCatalogEntry[]> {
       isActive: b.isActive !== false
     }));
   }
-  return [...AT_BANKS_FALLBACK].map(b => ({ ...b, country: "Hollanda", isActive: true }));
+  return [...AT_BANKS_FALLBACK].map(b => ({ ...b, country: "İrlanda", isActive: true }));
 }
 
 export async function getBankBySlug(slug: string): Promise<BankCatalogEntry | null> {
@@ -71,7 +58,7 @@ export async function getBankBySlug(slug: string): Promise<BankCatalogEntry | nu
   if (fallback) {
     return {
       ...fallback,
-      country: "Hollanda",
+      country: "İrlanda",
       isActive: true
     };
   }

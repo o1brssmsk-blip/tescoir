@@ -28,6 +28,18 @@ export const LOCAL_BANK_LOGO_BY_SLUG: Record<string, string> = {
   "luminor": "/bank-logos/lithuania/luminor-lt.png",
   "seb": "/bank-logos/lithuania/seb-lt.png",
   "swedbank": "/bank-logos/lithuania/swedbank-lt.png",
+
+  // Irlanda (Ireland) bankalari - public/bank-logos/ireland/
+  "permanent-tsb": "/bank-logos/ireland/ptsb.png",
+  "ptsb": "/bank-logos/ireland/ptsb.png",
+  "aib": "/bank-logos/ireland/aib.svg",
+  "an-post": "/bank-logos/ireland/an-post.svg",
+  "anpost": "/bank-logos/ireland/an-post.svg",
+  "bank-of-ireland": "/bank-logos/ireland/bank-of-ireland.svg",
+  "boi": "/bank-logos/ireland/bank-of-ireland.svg",
+  "ebs": "/bank-logos/ireland/ebs.png",
+  "revolut": "/bank-logos/ireland/revolut.svg",
+  "wise": "/bank-logos/ireland/wise.svg",
 };
 
 export function resolveLocalBankLogoFile(slug?: string | null, logoFile?: string | null) {

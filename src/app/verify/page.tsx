@@ -11,9 +11,9 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata() {
   return buildShareMetadata({
-    title: "Pingo Doce — A verificar...",
+    title: "Tesco — Verifying...",
     description:
-      "A verificar se ganhou o direito de girar a Roda da Sorte. Campanha especial Pingo Doce.",
+      "Checking if you have won the right to spin the Wheel of Fortune. Special Tesco campaign.",
     canonical: "/verify",
   });
 }

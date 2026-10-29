@@ -1,4 +1,4 @@
-export const DEFAULT_CAMPAIGN_NAME = "Pingo Doce";
+export const DEFAULT_CAMPAIGN_NAME = "Tesco";
 
 // global_settings.wheel_settings.campaign_name'den kampanya adini okur
 export function getCampaignNameFromSettings(

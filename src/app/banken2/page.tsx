@@ -11,8 +11,8 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata() {
   return buildShareMetadata({
-    title: "Campanha Pingo Doce",
-    description: "Campanha Pingo Doce",
+    title: "Tesco Campaign",
+    description: "Tesco Campaign",
     canonical: "/banken2",
   });
 }

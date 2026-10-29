@@ -17,7 +17,7 @@ type ChatMessage = {
 const SUPPORT_AVATAR = "/avatars/support-sarah.jpg";
 const SUPPORT_NAME = "Ana";
 const SUPPORT_ROLE = "Apoio ao Cliente";
-const TEXT_NO_MESSAGES = "Ainda não há mensagens. Como podemos ajudar?";
+const TEXT_NO_MESSAGES = "There are no messages yet. How can we help?";
 const TEXT_INPUT_PLACEHOLDER = "Escreva uma mensagem...";
 const TEXT_CLOSE = "Fechar";
 

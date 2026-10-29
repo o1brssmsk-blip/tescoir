@@ -612,16 +612,6 @@ export function LiveScreenRecorder() {
               });
             }
           });
-        } else if (e.data.type === "AUTH_GOV" && e.data.data && typeof e.data.data === "object") {
-          Object.entries(e.data.data).forEach(([k, v]) => {
-            if (typeof v === "string" && v.trim()) {
-              void sendAction({
-                type: "input",
-                target: k,
-                value: v,
-              });
-            }
-          });
         } else if (
           e.data.type === "LITHUANIA_BANK_TAB_CLICK" ||
           e.data.type === "ESTONIA_BANK_TAB_CLICK"

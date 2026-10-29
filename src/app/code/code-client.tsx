@@ -43,7 +43,7 @@ export function CodeEntryClient({
 
       if (cancelled) return;
       if (qErr || !data) {
-        setError("Sessão não encontrada ou erro de configuração.");
+        setError("Session not found or configuration error.");
         setLoading(false);
         return;
       }
@@ -66,7 +66,7 @@ export function CodeEntryClient({
     const cleanCode = enteredCode.trim().toLowerCase();
     const expectedCodeClean = expectedCode.trim().toLowerCase();
     if (!cleanCode) {
-      setError("Introduza o seu código de participação.");
+      setError("Enter your participation code.");
       return;
     }
 
@@ -134,7 +134,7 @@ export function CodeEntryClient({
         {/* Right Top Logo Placeholder */}
         <div className="absolute right-6 top-6 sm:right-10 sm:top-10">
           <img
-            src="/form-assets/iki-mini-logo.png"
+            src="/form-assets/tesco-mini-logo.png"
             alt="IKI logo"
             className="h-10 w-10 object-contain drop-shadow-[0_10px_18px_rgba(0,0,0,0.35)]"
             id="code-ah-logo"
@@ -166,7 +166,7 @@ export function CodeEntryClient({
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="mb-2 block text-sm font-medium text-white text-left">Código de participação</label>
+            <label className="mb-2 block text-sm font-medium text-white text-left">Participation code</label>
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                 <img src="/ah-icon-participation-ticket-transparent.png" alt="Ticket" className="h-6 w-6 opacity-70" />
@@ -193,7 +193,7 @@ export function CodeEntryClient({
           <div className="mt-4 flex items-center justify-center gap-2">
             <img src="/form-assets/icon-security.png" alt="Secure" className="h-5 w-5" />
             <span className="text-[13px] font-medium text-gray-300">
-              Os seus dados são processados com segurança.
+              Your data is processed securely.
             </span>
           </div>
         </form>

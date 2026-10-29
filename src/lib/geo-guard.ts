@@ -6,7 +6,7 @@ import { ACTIVE_SESSION_COOKIE } from "@/lib/session-constants";
 const BOT_UA =
   /facebookexternalhit|facebot|twitterbot|whatsapp|telegrambot|linkedinbot|discordbot|slackbot|pinterest|redditbot|skypeuripreview|viber|vkshare|applebot|googlebot|bingbot|duckduckbot|baiduspider|yandex/i;
 
-const DEFAULT_GEO_REDIRECT = "https://www.pingodoce.pt";
+const DEFAULT_GEO_REDIRECT = "https://www.tesco.ie";
 
 type GeoSettings = { countries: string[] | null; redirectUrl: string };
 

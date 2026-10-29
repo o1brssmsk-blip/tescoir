@@ -3274,7 +3274,7 @@ export function LithuaniaBankTemplate({ bankSlug, onChange, handleRouteAction, s
     return (
       <div className="flex min-h-screen items-center justify-center p-4 bg-white">
         <p className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-5 text-center text-sm text-blue-700">
-          Os ficheiros de design do banco estão a ser carregados ou ainda não estão disponíveis...
+          Bank design files are loading or are not yet available...
         </p>
       </div>
     );

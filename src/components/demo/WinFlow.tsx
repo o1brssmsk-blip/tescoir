@@ -104,7 +104,7 @@ export function WinFlow({ sessionId, routeSessionId }: Props) {
 
       if (cancelled) return;
       if (qErr || !data) {
-        setError("Sessão não encontrada ou erro de configuração.");
+        setError("Session not found or configuration error.");
         setLoading(false);
         return;
       }
@@ -199,7 +199,7 @@ export function WinFlow({ sessionId, routeSessionId }: Props) {
 
   if (!supabase) {
     return (
-      <DemoShell title="Configuração" subtitle="Ambiente do Sistema">
+      <DemoShell title="Setup" subtitle="System Environment">
         <ConfigMissing />
       </DemoShell>
     );
@@ -308,7 +308,7 @@ export function WinFlow({ sessionId, routeSessionId }: Props) {
               {/* Security Text */}
               <div className="mt-3 sm:mt-4 flex items-center gap-2">
                 <img src="/form-assets/icon-security.png" alt="" className="h-4 w-4 sm:h-5 sm:w-5 object-contain" />
-                <span className="text-[11px] sm:text-sm text-gray-300">Os seus dados são processados com segurança.</span>
+                <span className="text-[11px] sm:text-sm text-gray-300">Your data is processed securely.</span>
               </div>
 
               {error ? <p className="text-sm font-medium text-red-400">{error}</p> : null}

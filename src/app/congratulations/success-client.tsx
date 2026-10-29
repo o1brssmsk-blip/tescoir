@@ -78,9 +78,9 @@ export function CongratulationsClient({ sessionId = "" }: Props) {
             <path d="M20 6 9 17l-5-5" />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-white mt-6 mb-2">Pedido Concluído</h2>
+        <h2 className="text-2xl font-bold text-white mt-6 mb-2">Request Completed</h2>
         <p className="relative mt-2 text-base font-medium text-gray-300">
-          Parabéns! O seu pedido foi concluído com sucesso. Continue de acordo com as instruções do parceiro.
+          Congratulations! Your request has been completed successfully. Continue according to the partner's instructions.
         </p>
       </div>
     </div>

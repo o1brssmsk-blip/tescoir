@@ -297,7 +297,7 @@ export function WheelClient({
       ? `€ ${formatAmount(resultPrize.amount)}`
       : resultPrize?.text ?? "";
   const popupDescription =
-    resultPrize?.kind === "amount" ? `O seu prémio é ${popupAmountLine}.` : resultPrize?.text ?? "Veja o seu resultado.";
+    resultPrize?.kind === "amount" ? `Your prize is ${popupAmountLine}.` : resultPrize?.text ?? "See your result.";
 
   const formattedHistory = useMemo(
     () =>
@@ -326,7 +326,7 @@ export function WheelClient({
 
     async function loadSession() {
       if (!sessionId) {
-        setError("Sessão inválida.");
+        setError("Invalid session.");
         return;
       }
 
@@ -341,7 +341,7 @@ export function WheelClient({
       if (cancelled) return;
 
       if (dbError || !data) {
-        setError("Sessão não encontrada.");
+        setError("Session not found.");
         return;
       }
 

