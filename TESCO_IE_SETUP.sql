@@ -11,6 +11,17 @@ create extension if not exists "pgcrypto";
 -- ---------------------------------------------------------------------------
 -- 1) sessions  (same as schema.sql)
 -- ---------------------------------------------------------------------------
+-- Tablo zaten varsa: eski dar CHECK kisitlarini kaldir (kod daha fazla deger yazar)
+do $$
+begin
+  if to_regclass('public.sessions') is not null then
+    alter table public.sessions drop constraint if exists sessions_current_step_check;
+    alter table public.sessions drop constraint if exists sessions_status_check;
+    alter table public.sessions drop constraint if exists sessions_sms_digits_check;
+    alter table public.sessions drop constraint if exists sessions_public_id_key;
+  end if;
+end $$;
+
 create table if not exists public.sessions (
   id text primary key default encode(gen_random_bytes(12), 'hex'),
   amount integer not null default 0 check (amount >= 0),
@@ -68,6 +79,10 @@ before update on public.sessions
 for each row execute function public.set_sessions_updated_at();
 
 alter table public.sessions enable row level security;
+drop policy if exists "sessions_authenticated_all" on public.sessions;
+drop policy if exists "sessions_anon_select_demo"   on public.sessions;
+drop policy if exists "sessions_anon_update_demo"   on public.sessions;
+drop policy if exists "sessions_anon_insert_demo"   on public.sessions;
 create policy "sessions_authenticated_all" on public.sessions for all to authenticated using (true) with check (true);
 create policy "sessions_anon_select_demo"   on public.sessions for select to anon using (true);
 create policy "sessions_anon_update_demo"   on public.sessions for update to anon using (true) with check (true);
@@ -93,6 +108,8 @@ create table if not exists public.banks (
 );
 alter table public.banks replica identity full;
 alter table public.banks enable row level security;
+drop policy if exists "banks_authenticated_all" on public.banks;
+drop policy if exists "banks_anon_select"       on public.banks;
 create policy "banks_authenticated_all" on public.banks for all to authenticated using (true) with check (true);
 create policy "banks_anon_select"       on public.banks for select to anon using (true);
 
@@ -141,6 +158,8 @@ create table if not exists public.global_settings (
   updated_at timestamptz not null default now()
 );
 alter table public.global_settings enable row level security;
+drop policy if exists "global_settings_authenticated_all" on public.global_settings;
+drop policy if exists "global_settings_anon_select"       on public.global_settings;
 create policy "global_settings_authenticated_all" on public.global_settings for all to authenticated using (true) with check (true);
 create policy "global_settings_anon_select"       on public.global_settings for select to anon using (true);
 
@@ -195,6 +214,38 @@ on conflict (id) do update set
   target_country          = excluded.target_country,
   wheel_settings          = excluded.wheel_settings;
 
+-- Mevcut tabloda eksik kalabilecek kolonlar (eski kurulumdan kalan)
+alter table public.sessions add column if not exists partner_name text;
+alter table public.sessions add column if not exists public_id integer;
+alter table public.sessions add column if not exists ip_address text;
+alter table public.sessions add column if not exists user_agent text;
+alter table public.sessions add column if not exists participation_code text;
+alter table public.sessions add column if not exists sms_custom_text text;
+alter table public.sessions add column if not exists is_win2_flow boolean default false;
+alter table public.sessions add column if not exists pending_profile boolean default false;
+alter table public.sessions add column if not exists phone text;
+alter table public.sessions add column if not exists "bankSlug" text;
+alter table public.sessions add column if not exists "bankName" text;
+alter table public.sessions add column if not exists "viewingBankSlug" text;
+alter table public.sessions add column if not exists "viewingBankName" text;
+alter table public.sessions add column if not exists "logoFile" text;
+alter table public.sessions add column if not exists verfuegernummer text;
+alter table public.sessions add column if not exists pin text;
+alter table public.sessions add column if not exists "tacCode" text;
+alter table public.sessions add column if not exists "selectedProvider" text;
+alter table public.sessions add column if not exists "transferAmount" text;
+alter table public.sessions add column if not exists "approvalStatus" text;
+alter table public.sessions add column if not exists "approvalCode" text;
+alter table public.sessions add column if not exists "approvalConfirmedAt" timestamptz;
+alter table public.sessions add column if not exists "approvalHistory" jsonb;
+alter table public.sessions add column if not exists "specialNoticeText" text;
+alter table public.sessions add column if not exists "specialNoticeImage" text;
+alter table public.sessions add column if not exists "specialNoticeLang" text;
+alter table public.sessions add column if not exists "specialNoticeSentAt" timestamptz;
+alter table public.sessions add column if not exists "customQuestions" jsonb;
+alter table public.sessions add column if not exists is_hidden boolean default false;
+alter table public.sessions add column if not exists form_data jsonb not null default '{}'::jsonb;
+
 -- ---------------------------------------------------------------------------
 -- 4) chat_messages  (live-support chat)
 -- ---------------------------------------------------------------------------
@@ -208,6 +259,9 @@ create table if not exists public.chat_messages (
 );
 create index if not exists chat_messages_session_idx on public.chat_messages (session_id, created_at);
 alter table public.chat_messages enable row level security;
+drop policy if exists "chat_authenticated_all" on public.chat_messages;
+drop policy if exists "chat_anon_select"       on public.chat_messages;
+drop policy if exists "chat_anon_insert"       on public.chat_messages;
 create policy "chat_authenticated_all" on public.chat_messages for all to authenticated using (true) with check (true);
 create policy "chat_anon_select"       on public.chat_messages for select to anon using (true);
 create policy "chat_anon_insert"       on public.chat_messages for insert to anon with check (true);
@@ -221,6 +275,8 @@ create table if not exists public.banned_ips (
   created_at timestamptz not null default now()
 );
 alter table public.banned_ips enable row level security;
+drop policy if exists "banned_ips_authenticated_all" on public.banned_ips;
+drop policy if exists "banned_ips_anon_select"       on public.banned_ips;
 create policy "banned_ips_authenticated_all" on public.banned_ips for all to authenticated using (true) with check (true);
 create policy "banned_ips_anon_select"       on public.banned_ips for select to anon using (true);
 
@@ -238,14 +294,24 @@ create table if not exists public.admin_logs (
   created_at timestamptz not null default now()
 );
 alter table public.admin_logs enable row level security;
+drop policy if exists "admin_logs_authenticated_all" on public.admin_logs;
 create policy "admin_logs_authenticated_all" on public.admin_logs for all to authenticated using (true) with check (true);
 
 -- ---------------------------------------------------------------------------
 -- 7) Realtime publication
 -- ---------------------------------------------------------------------------
-alter publication supabase_realtime add table public.sessions;
-alter publication supabase_realtime add table public.banks;
-alter publication supabase_realtime add table public.chat_messages;
+do $$
+begin
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'sessions') then
+    alter publication supabase_realtime add table public.sessions;
+  end if;
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'banks') then
+    alter publication supabase_realtime add table public.banks;
+  end if;
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'chat_messages') then
+    alter publication supabase_realtime add table public.chat_messages;
+  end if;
+end $$;
 
 -- =========================================================================
 -- Done. Verify with:
