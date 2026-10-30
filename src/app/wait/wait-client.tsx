@@ -112,7 +112,7 @@ export function WaitClient({ sessionId, routeSessionId }: Props) {
             </p>
           </div>
         ) : (
-          <div className="w-full bg-white/90 backdrop-blur-xl rounded-[28px] shadow-[0_20px_60px_-15px_rgba(0,83,159,0.15)] p-8 md:p-10 flex flex-col items-center relative overflow-hidden border border-white/60 mx-auto max-w-[440px]">
+          <div className="w-full bg-white rounded-[28px] shadow-[0_20px_60px_-15px_rgba(0,83,159,0.15)] p-8 md:p-10 flex flex-col items-center relative overflow-hidden border border-[#dbe6f3] mx-auto max-w-[440px]">
             {/* Top Security Banner */}
             <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[var(--brand)] via-[#4d9de0] to-[#ee1c2e] bg-[length:200%_100%] animate-[pulse_3s_ease-in-out_infinite]" />
             
@@ -129,7 +129,7 @@ export function WaitClient({ sessionId, routeSessionId }: Props) {
               </svg>
             </div>
 
-            <h2 className="text-[24px] font-bold text-slate-800 mb-2 text-center tracking-tight">
+            <h2 className="text-[24px] font-bold text-[#0a2463] mb-2 text-center tracking-tight">
               {settings.wait_title}
             </h2>
             

