@@ -3,16 +3,13 @@
 import { useState, useEffect } from "react";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
-// Cark plani: index 0 = mesaj segmenti (ustte), 1..7 = para segmentleri (saat yonunde).
-// Admin bu 7 slot icin tutar + sans (%) degerlerini duzenler.
+// Cark plani (9 dilim): sadece 3 CASH segmenti kazanilir
+// (€1,500 / €500 / €2,000). Diger dilimler dekor — kazanilamaz.
+// Admin bu 3 slot icin tutar + sans (%) degerlerini duzenler.
 const DEFAULT_PRIZES = [
-  { amount: 1000, weight: 24 },
-  { amount: 2000, weight: 19 },
-  { amount: 500, weight: 5 },
-  { amount: 3000, weight: 0 },
-  { amount: 750, weight: 11 },
-  { amount: 2500, weight: 14 },
-  { amount: 1500, weight: 27 },
+  { amount: 1500, weight: 40 },
+  { amount: 500, weight: 35 },
+  { amount: 2000, weight: 25 },
 ];
 
 function normalizePrizes(raw: unknown) {

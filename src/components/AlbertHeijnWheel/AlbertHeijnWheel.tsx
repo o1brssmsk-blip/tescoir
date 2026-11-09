@@ -139,8 +139,8 @@ export const AlbertHeijnWheel = forwardRef<HTMLDivElement, Props>(function Alber
   // Rim'in kapladigi dis bant: carki merkezinden hafif kucultur (sadece yeni gomulu-art mobil icin)
   const wheelScale = 1;
   // wheel.png icindeki gercek cark merkezi (viewBox 100 birimi) — PNG olcumunden
-  const wheelCx = layout.sceneKey === "mobile" ? 49.8 : 49.95;
-  const wheelCy = layout.sceneKey === "mobile" ? 48.55 : 49.55;
+  const wheelCx = layout.sceneKey === "mobile" ? 49.56 : 49.95;
+  const wheelCy = layout.sceneKey === "mobile" ? 48.76 : 49.95;
   const labelR = 29; // dilim bandinin ortasi (hub ~19 .. rim ~44) — yazi bandin ortasinda
   const labelLen = 16;
 

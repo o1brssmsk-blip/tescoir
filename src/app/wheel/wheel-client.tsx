@@ -41,12 +41,20 @@ const LOCAL_HISTORY_KEY = "ah-prize-wheel-last-five-wins";
 const MAX_HISTORY_ITEMS = 5;
 
 // ============================================================
-//  CARK SEGMENT PLANI (8 segment, tepe = index 0):
-//    Index 0  -> MESAJ segmenti (kaybetme / tekrar dene) — ustte
-//    Index 1-7 -> PARA segmentleri, saat yonunde
+//  CARK SEGMENT PLANI (9 segment, tepe = index 0, saat yonunde):
+//    0 -> TRY AGAIN              (kazanilamaz)
+//    1 -> iPhone 18 Pro Max      (kazanilamaz — dekor)
+//    2 -> €1,500 CASH            (kazanilir)
+//    3 -> AirPods Pro            (kazanilamaz — dekor)
+//    4 -> Car for a Year         (kazanilamaz — dekor)
+//    5 -> €250 Tesco Gift Card   (kazanilamaz — dekor)
+//    6 -> €100 Shopping Voucher  (kazanilamaz — dekor)
+//    7 -> €500 CASH              (kazanilir)
+//    8 -> €2,000 CASH            (kazanilir)
 //
-//  Tutar + sans oranlari ADMIN PANELDEN (global_settings.wheel_settings.prizes)
-//  okunur. Cark PNG'si YAZISIZ uretilir; yazilar SVG ile basilir.
+//  SADECE CASH dilimleri kazanilabilir — geri kalanlar sadece
+//  gorselde gorunur. Tutar + sans oranlari ADMIN PANELDEN
+//  (global_settings.wheel_settings.prizes) okunur.
 // ============================================================
 const RETRY_SEGMENT: PrizeSegment = {
   kind: "message",
@@ -58,16 +66,29 @@ const RETRY_SEGMENT: PrizeSegment = {
   darkText: false,
 };
 
-// Index 1..7 (saat yonunde) icin varsayilan tutar + sans (% agirlik)
-const DEFAULT_WHEEL_AMOUNTS: Array<{ amount: number; weight: number }> = [
-  { amount: 1000, weight: 24 },
-  { amount: 2000, weight: 19 },
-  { amount: 500, weight: 5 },
-  { amount: 3000, weight: 0 },
-  { amount: 750, weight: 11 },
-  { amount: 2500, weight: 14 },
-  { amount: 1500, weight: 27 },
+// Kazanilamaz dekor segmentleri (rotationIndex -> gorunen etiket)
+const NON_CASH_SEGMENTS: ReadonlyArray<{
+  index: number;
+  text: string;
+  popupLines: string[];
+}> = [
+  { index: 1, text: "iPhone 18 Pro Max", popupLines: ["iPhone", "18 Pro Max"] },
+  { index: 3, text: "AirPods Pro", popupLines: ["AirPods", "Pro"] },
+  { index: 4, text: "Car for a Year", popupLines: ["Car", "for a Year"] },
+  { index: 5, text: "€250 Tesco Gift Card", popupLines: ["€250", "Gift Card"] },
+  { index: 6, text: "€100 Shopping Voucher", popupLines: ["€100", "Voucher"] },
 ];
+
+// Kazanilabilir CASH segmentleri — admin paneli wheel_settings.prizes
+// sirasiyla bu 3 girise karsilik gelir (amount/weight duzenlenebilir,
+// rotationIndex goruntuye sabitlenmistir).
+const DEFAULT_WHEEL_AMOUNTS: Array<{ amount: number; weight: number; rotationIndex: number }> = [
+  { amount: 1500, weight: 40, rotationIndex: 2 },
+  { amount: 500, weight: 35, rotationIndex: 7 },
+  { amount: 2000, weight: 25, rotationIndex: 8 },
+];
+
+const SEGMENT_COUNT = 9;
 
 type WheelPrizeConfig = {
   prizes: PrizeSegment[];
@@ -105,10 +126,23 @@ function buildWheelPrizes(wheelSettings: unknown): WheelPrizeConfig {
     };
   });
 
-  const prizes: PrizeSegment[] = [
-    RETRY_SEGMENT,
-    ...entries.map((e, i) => makeAmountSegment(e.amount, i + 1)),
-  ];
+  const prizes: PrizeSegment[] = new Array<PrizeSegment>(SEGMENT_COUNT);
+  prizes[0] = RETRY_SEGMENT;
+  for (const seg of NON_CASH_SEGMENTS) {
+    prizes[seg.index] = {
+      kind: "message",
+      text: seg.text,
+      selectionIndex: seg.index,
+      rotationIndex: seg.index,
+      amount: null,
+      popupLines: seg.popupLines,
+      darkText: false,
+    };
+  }
+  entries.forEach((e, i) => {
+    const rotationIndex = DEFAULT_WHEEL_AMOUNTS[i].rotationIndex;
+    prizes[rotationIndex] = makeAmountSegment(e.amount, rotationIndex);
+  });
   const weights: Record<number, number> = {};
   entries.forEach((e) => {
     weights[e.amount] = e.weight;
@@ -177,7 +211,8 @@ function getRandomWinnablePrize(cfg: WheelPrizeConfig) {
     const weight = cfg.weights[prize.amount ?? 0] ?? 1;
     for (let i = 0; i < weight; i++) weightedList.push(prize);
   }
-  if (weightedList.length === 0) return cfg.winnable[0] ?? cfg.prizes[1] ?? cfg.prizes[0];
+  if (weightedList.length === 0)
+    return cfg.winnable[0] ?? cfg.prizes.find((p) => p.kind === "amount") ?? cfg.prizes[0];
   const idx = Math.floor(Math.random() * weightedList.length);
   return weightedList[idx];
 }
