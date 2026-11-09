@@ -134,7 +134,7 @@ export function PrizePopup({
             <div className={popupConfig.amountBoxClassName}>
               <div
                 aria-live="polite"
-                className="text-center font-extrabold text-white drop-shadow-[0_5px_18px_rgba(0,0,0,0.42)]"
+                className="text-center font-extrabold text-[#0a2463] drop-shadow-[0_2px_6px_rgba(255,255,255,0.9)]"
                 style={{
                   fontFamily: "var(--font-inter), system-ui, -apple-system, sans-serif",
                   fontSize: result.kind === "amount" ? popupConfig.amountFontSize(amountLine) : popupConfig.messageFontSize,
