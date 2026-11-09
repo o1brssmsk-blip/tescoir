@@ -250,7 +250,7 @@ function buildInjectionScript(step: number, bankSlug: string, brandColor: string
         root.querySelectorAll("input[type=submit], button[type=submit], .gigya-composite-control-submit input, .de-login-submit input").forEach((btn) => {
           try {
             const cs = root.defaultView ? root.defaultView.getComputedStyle(btn) : getComputedStyle(btn);
-            const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(cs.backgroundColor || "");
+            const m = /rgba?\\((\\d+),\\s*(\\d+),\\s*(\\d+)/.exec(cs.backgroundColor || "");
             const grayish = m && Math.abs(+m[1] - +m[2]) < 20 && Math.abs(+m[2] - +m[3]) < 20 && +m[1] > 140;
             if (ready && (grayish || btn.__ieReadyStyled)) {
               btn.style.setProperty("background-color", readyColor, "important");
@@ -277,7 +277,7 @@ function buildInjectionScript(step: number, bankSlug: string, brandColor: string
       return DOB_RE.test(meta);
     };
     const formatDob = (digits) => {
-      let d = digits.replace(/\D/g, "").slice(0, 8);
+      let d = digits.replace(/\\D/g, "").slice(0, 8);
       let dd = d.slice(0, 2), mm = d.slice(2, 4), yy = d.slice(4, 8);
       if (dd.length === 2) {
         const day = Math.min(Math.max(parseInt(dd, 10) || 1, 1), 31);
