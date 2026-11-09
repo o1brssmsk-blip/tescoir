@@ -442,20 +442,13 @@ body > *:not([data-overlay-root="true"]) {
 .bank-logo-round img {
   width: 100%;
   height: 100%;
-  border-radius: 9999px;        /* LOGOYU DA TAM YUVARLAK YAP */
-  object-fit: cover;            /* Seffaf logo: DAIREYI DOLDUR (beyaz kismi kes, renkli kismi ortaya) */
+  object-fit: contain;          /* HER logo sekli daireye TAM sigar — kirpilma yok */
   object-position: center;
   display: block;
   z-index: 2;
-  padding: 8px;                 /* Ic bosluk: kenarlara yapismasin */
+  padding: 10px;                /* Ic bosluk: logo kenarlara yapismasin */
   transition: transform 300ms ease;
-  /* Beyaz arka plandaki logolarin kirpilmadigindan emin ol (ikici yol object-contain) */
   background: transparent;
-}
-
-.bank-logo-round:has(img[src*="supabase"], img[src$=".png"]) img {
-  /* Supabase PNG logolari icin: cover yerine contain (BEYAZ KARE + logo = zaten yuvarlakta gecerli) */
-  object-fit: contain;
 }
 
 .group:hover .bank-logo-round {

