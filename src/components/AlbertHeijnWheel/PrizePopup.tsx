@@ -30,27 +30,27 @@ type Props = {
 const POPUP_CONFIG = {
   desktop: {
     src: "/popup-assets/popup-desktop.png",
-    nameBoxClassName: "absolute left-[10%] top-[39.5%] flex h-[4.5%] w-[47.8%] items-center justify-center px-[2%]",
+    nameBoxClassName: "absolute left-[9.9%] top-[39.9%] flex h-[4.7%] w-[47.9%] items-center justify-center px-[2%]",
     nameFontSize: (name: string) =>
       name.length >= 18 ? "clamp(0.85rem, 1.3vw, 1.2rem)" : name.length >= 12 ? "clamp(1.05rem, 1.7vw, 1.5rem)" : name.length >= 8 ? "clamp(1.25rem, 2vw, 1.8rem)" : "clamp(1.5rem, 2.4vw, 2.2rem)",
-    amountBoxClassName: "absolute left-[9.6%] top-[61.8%] flex h-[3.6%] w-[48.3%] items-center justify-center px-[3%]",
+    amountBoxClassName: "absolute left-[9.6%] top-[61.9%] flex h-[4.7%] w-[48.3%] items-center justify-center px-[3%]",
     ctaClassName: "absolute left-[10%] top-[74.5%] h-[9%] w-[47%] rounded-full",
     closeClassName: "absolute right-[5.5%] top-[9%] h-[9%] w-[7.5%] rounded-full",
     amountFontSize: (label: string) =>
-      label.length >= 6 ? "clamp(1.5rem, 2.7vw, 2.3rem)" : label.length >= 5 ? "clamp(1.8rem, 3.1vw, 2.7rem)" : "clamp(2.1rem, 3.7vw, 3.1rem)",
+      label.length >= 6 ? "clamp(1.5rem, 2.7vw, 2.3rem)" : label.length >= 5 ? "clamp(1.8rem, 3vw, 2.6rem)" : "clamp(2.1rem, 3.4vw, 2.9rem)",
     messageFontSize: "clamp(1.3rem, 2.2vw, 1.8rem)",
     maxWidthClassName: "md:max-w-[720px]",
   },
   mobile: {
     src: "/popup-assets/popup-mobile.png",
-    nameBoxClassName: "absolute left-[16.7%] top-[27.6%] flex h-[6.1%] w-[66.5%] items-center justify-center px-[1.5%]",
+    nameBoxClassName: "absolute left-[16.7%] top-[29.9%] flex h-[3.1%] w-[66.5%] items-center justify-center px-[1.5%]",
     nameFontSize: (name: string) =>
       name.length >= 18 ? "clamp(0.95rem, 3.8vw, 1.35rem)" : name.length >= 12 ? "clamp(1.2rem, 5vw, 1.7rem)" : name.length >= 8 ? "clamp(1.4rem, 5.9vw, 2.05rem)" : "clamp(1.65rem, 6.8vw, 2.35rem)",
-    amountBoxClassName: "absolute left-[15.5%] top-[69.7%] flex h-[4.3%] w-[68.8%] items-center justify-center px-[4%]",
+    amountBoxClassName: "absolute left-[15.6%] top-[71.8%] flex h-[3.4%] w-[68.7%] items-center justify-center px-[4%]",
     ctaClassName: "absolute left-[16%] top-[77%] h-[8%] w-[68%] rounded-full",
     closeClassName: "absolute right-[6%] top-[7%] h-[4%] w-[10%] rounded-full",
     amountFontSize: (label: string) =>
-      label.length >= 6 ? "clamp(2rem, 7.6vw, 2.9rem)" : label.length >= 5 ? "clamp(2.3rem, 8.6vw, 3.2rem)" : "clamp(2.6rem, 9.6vw, 3.5rem)",
+      label.length >= 6 ? "clamp(2rem, 7.6vw, 2.9rem)" : label.length >= 5 ? "clamp(2.3rem, 8.4vw, 3rem)" : "clamp(2.6rem, 9vw, 3.1rem)",
     messageFontSize: "clamp(1rem, 4.4vw, 1.35rem)",
     maxWidthClassName: "sm:max-w-[420px]",
   },

