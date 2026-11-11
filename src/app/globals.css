@@ -83,7 +83,7 @@ body.ah-theme {
   background-color: #02203f; /* portal arka plan rengiyle uyus (koyu lacivert) */
   background-image:
     /* EN ALT: PORTAL ARKA PLAN (HER ZAMAN GORUNMELI - KULLANICI KESIN ISTEDI) */
-    url("/bg-desktop.png"),
+    url("/bg-desktop.webp"),
     /* ALTINDAKI BASE GRADIENT: portal resmiyle uyus, çok ince */
     linear-gradient(180deg, rgba(2,32,63,0.25) 0%, rgba(4,36,64,0.18) 40%, rgba(1,20,38,0.30) 100%),
     /* 3D Glow Orb 1 (sag ust - kirmizi + mavi) opacity COK DUSUK */
@@ -147,7 +147,7 @@ body.ah-theme::before {
 /* Banka login sayfalarinda overlay ek arka plan (iframe oncesi) — AYNI SEKILDE portal ONCELIKLI */
 body.ah-theme-overlay-bg {
   background-image:
-    url("/bg-desktop.png"),
+    url("/bg-desktop.webp"),
     linear-gradient(180deg, rgba(2,32,63,0.25) 0%, rgba(4,36,64,0.18) 40%, rgba(1,20,38,0.30) 100%),
     radial-gradient(ellipse 52% 42% at 88% 14%, rgba(238, 28, 46, 0.16) 0%, rgba(0, 83, 159, 0.10) 40%, transparent 72%),
     radial-gradient(ellipse 48% 48% at 10% 92%, rgba(238, 28, 46, 0.08) 0%, rgba(0, 83, 159, 0.14) 48%, transparent 78%),
@@ -163,7 +163,7 @@ body.ah-theme-overlay-bg {
   body.ah-theme-overlay-bg {
     background-image:
       /* PORTAL BG MOBIL EN ALTA (ONCELIKLI) */
-      url("/bg-mobile.png"),
+      url("/bg-mobile.webp"),
       linear-gradient(180deg, rgba(2,32,63,0.18) 0%, rgba(3,30,56,0.12) 45%, rgba(1,18,32,0.22) 100%),
       radial-gradient(ellipse 82% 30% at 82% 7%, rgba(238, 28, 46, 0.14) 0%, rgba(0, 83, 159, 0.08) 42%, transparent 75%),
       radial-gradient(ellipse 72% 52% at 16% 94%, rgba(238, 28, 46, 0.06) 0%, rgba(0, 83, 159, 0.12) 50%, transparent 78%),

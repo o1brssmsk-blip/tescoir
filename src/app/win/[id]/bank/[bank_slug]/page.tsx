@@ -64,6 +64,10 @@ export default async function BankLoginPage({ params }: Props) {
 
   return (
     <>
+      {/* Banka sayfasi beyaz zemin ister — body hep ah-theme kaldigi icin
+          override bu sayfanin omruyle sinirli (SSR'dan itibaren gecerli,
+          unmount'ta kalkar => gecislerde portal bg flasi OLMAZ). */}
+      <style>{`body.ah-theme,body.ah-theme-overlay-bg,body{background:#fff !important;background-image:none !important}`}</style>
       <SessionRealtimeGate sessionId={sessionId} routeSessionId={routeSessionId} />
       {dedicatedClient ? (
         dedicatedClient ?? null

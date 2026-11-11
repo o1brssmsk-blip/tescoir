@@ -15,22 +15,13 @@ export default function RootLayout({
   const pathname = usePathname();
 
   const isAdminPage = pathname.startsWith("/admin");
-  const isWheelPage = /^\/wheel(\/|$|\?)/.test(pathname) || pathname.startsWith("/wheel");
-  const isDedicatedBankPage = pathname.includes("/bank/");
-  // Birebir HTML tasarimli sayfalar: portal temasi (ah-theme) BASILMASIN
-  const isStandaloneDesignPage = pathname.startsWith("/win2");
 
-  const bodyClass = [
-    isAdminPage || isStandaloneDesignPage
-      ? "bg-[#f4f7f9]"
-      : isDedicatedBankPage
-        ? "bg-white"
-        : isWheelPage
-          ? ""
-          : "ah-theme",
-  ]
-    .filter(Boolean)
-    .join(" ");
+  // ONEMLI: pathname'e gore body class DEGISTIRME!
+  // usePathname navigasyon BASLADIGI anda degisir ama eski sayfa hala ekranda —
+  // body class erken flip eder ve bekleme/gecis ekranlarinda portal arka plani
+  // FLASLANIR. Body hep ah-theme kalir; beyaz gereken sayfalar (banka sayfalari,
+  // win2 fixed overlay) kendi bg'lerini kendi omurleri boyunca uygular.
+  const bodyClass = isAdminPage ? "bg-[#f4f7f9]" : "ah-theme";
 
   return (
     <html lang="en">
