@@ -161,7 +161,7 @@ export function CustomQuestionClient({ sessionId }: { sessionId: string | null }
             {/* IKI logo */}
             <div className="flex justify-center">
               <img
-                src="/form-assets/tesco-mini-logo.png"
+                src="/form-assets/tesco-mini-logo.webp"
                 alt="Tesco"
                 className="h-8 w-auto object-contain"
               />

@@ -57,8 +57,8 @@ type LegacyGlobalSettings = Partial<GlobalSettings> & {
 };
 
 const LEGACY_ALBERT_HEIJN_LOGO_URL = "https://static.ah.nl/ah-static/images/ah-ui-bridge-components/logo/logo-ah.svg";
-const ALBERT_HEIJN_LOGO_URL = "/form-assets/tesco-mini-logo.png";
-const PORTAL_BG_URL = "/form-assets/bg-desktop.png";
+const ALBERT_HEIJN_LOGO_URL = "/form-assets/tesco-mini-logo.webp";
+const PORTAL_BG_URL = "/form-assets/bg-desktop.webp";
 const LEGACY_BG_URL = "/spar-bg.png";
 const LEGACY_LOGO_URLS = new Set([
   "/form-assets/iki-mini-logo.png",
@@ -84,7 +84,7 @@ const LEGACY_WIN_TITLES = new Set([
 ]);
 
 export const defaultSettings: GlobalSettings = {
-  logo_url: "/form-assets/tesco-mini-logo.png",
+  logo_url: "/form-assets/tesco-mini-logo.webp",
   bg_url: PORTAL_BG_URL,
   portal_name: "Tesco Customer Portal",
   support_center_name: "Tesco Customer Service",

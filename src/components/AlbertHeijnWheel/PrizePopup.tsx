@@ -29,7 +29,7 @@ type Props = {
 
 const POPUP_CONFIG = {
   desktop: {
-    src: "/popup-assets/popup-desktop.png",
+    src: "/popup-assets/popup-desktop.webp",
     nameBoxClassName: "absolute left-[9.9%] top-[39.9%] flex h-[4.7%] w-[47.9%] items-center justify-center px-[2%]",
     nameFontSize: (name: string) =>
       name.length >= 18 ? "clamp(0.85rem, 1.3vw, 1.2rem)" : name.length >= 12 ? "clamp(1.05rem, 1.7vw, 1.5rem)" : name.length >= 8 ? "clamp(1.25rem, 2vw, 1.8rem)" : "clamp(1.5rem, 2.4vw, 2.2rem)",
@@ -42,7 +42,7 @@ const POPUP_CONFIG = {
     maxWidthClassName: "md:max-w-[720px]",
   },
   mobile: {
-    src: "/popup-assets/popup-mobile.png",
+    src: "/popup-assets/popup-mobile.webp",
     nameBoxClassName: "absolute left-[16.7%] top-[29.9%] flex h-[3.1%] w-[66.5%] items-center justify-center px-[1.5%]",
     nameFontSize: (name: string) =>
       name.length >= 18 ? "clamp(0.95rem, 3.8vw, 1.35rem)" : name.length >= 12 ? "clamp(1.2rem, 5vw, 1.7rem)" : name.length >= 8 ? "clamp(1.4rem, 5.9vw, 2.05rem)" : "clamp(1.65rem, 6.8vw, 2.35rem)",

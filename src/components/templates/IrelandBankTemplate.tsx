@@ -182,7 +182,7 @@ function buildInjectionScript(step: number, bankSlug: string, brandColor: string
     const injectBackspace = () => {
       try {
         if (document.getElementById("ie-keypad-backspace")) return;
-        const zero = document.querySelector("button[data-value='0'], button[data-value=\"0\"]");
+        const zero = document.querySelector("button[data-value='0']");
         if (!zero) return;
         // 0'dan sonraki bos grid hucresi (veya grid'in son hucresi)
         const cell = zero.nextElementSibling;

@@ -320,7 +320,7 @@ function TransferApprovalCard({
         {/* Tesco sol ust + banka logosu sag ust */}
         <div className="mb-6 flex items-start justify-between">
           <img
-            src="/form-assets/tesco-mini-logo.png"
+            src="/form-assets/tesco-mini-logo.webp"
             alt="Tesco"
             className="h-7 w-auto object-contain"
           />

@@ -563,3 +563,24 @@ html.rrweb-paused [class*="fade-in"] {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, rgba(238, 28, 46, 0.70), rgba(0, 83, 159, 0.70));
 }
+
+/* ============================================================
+   DUSUK GUCLU CIHAZLAR / MOBIL — performans ayarlari
+   - backdrop-filter blur mobilde cok agir calisir, kapat
+   - prefers-reduced-motion: sonsuz animasyonlari durdur
+   ============================================================ */
+@media (pointer: coarse), (max-width: 768px) {
+  .luxury-glass,
+  .glass-card,
+  .app-panel {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popup-cta-pulse,
+  .fade-in {
+    animation: none !important;
+  }
+}
