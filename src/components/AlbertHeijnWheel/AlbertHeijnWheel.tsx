@@ -136,8 +136,9 @@ export const AlbertHeijnWheel = forwardRef<HTMLDivElement, Props>(function Alber
   // Gorsel tutarlar wheel.png icine GOMULU — SVG overlay kapali.
   // Tekrar HTML overlay'a donmek icin false yap.
   const BAKED_PRIZE_ART = true;
-  // Rim'in kapladigi dis bant: carki merkezinden hafif kucultur (sadece yeni gomulu-art mobil icin)
-  const wheelScale = 1;
+  // Disk, rim'in ic acikligina tam otursun diye merkezinden kucultulur
+  // (rim.webp ic delik ~%70, disk %99.7 -> 0.85 ile segment yazilari rim altina kacmaz)
+  const wheelScale = 0.85;
   // wheel.png icindeki gercek cark merkezi (viewBox 100 birimi) — PNG olcumunden
   const wheelCx = 50;
   const wheelCy = 50;

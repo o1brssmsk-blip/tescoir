@@ -10,6 +10,7 @@ import { getPreferredRouteSessionId, persistActiveSession } from "@/lib/session-
 import { useSettings } from "@/contexts/SettingsContext";
 import { countriesMatch } from "@/lib/country-utils";
 import { resolveLocalBankLogoFile } from "@/lib/bank-logo-constants";
+import { archivePreviousBankOnChange } from "@/lib/bank-cleanup";
 
 type Props = {
   sessionId: string;
@@ -220,27 +221,19 @@ export function BankenClientClean({ sessionId, routeSessionId, initialBanks }: P
       /* fresh fetch basarisizsa stale ile devam */
     }
 
+    // 🔴 KRITIK: bankSlug / bankName ALANLARINI BURADA DB YE YAZMA!
+    //    Onlar son SUBMIT edilmis bankanin kayit verileridir.
+    //
+    // 🔴 BANKA DEGISIMI: Eski bankanin credential kaydini hemen history'ye
+    //    arsivle + flat credential alanlarini temizle (paylasilan helper).
+    //    Aksi halde admin paneli eski bankanin verilerini YENI bankanin
+    //    kolonlarinda gosterir ve eski veri yeni giris formuna sizar.
     const nextFormData: Record<string, any> = {
-      ...freshFormData,
-      // Admin'in guncel goruntuleme kolonu icin (bankSlug/bankName'e DOKUNMA —
-      // onlar son SUBMIT edilmis bankanin kayit verileridir, history'de lazim):
+      ...archivePreviousBankOnChange(freshFormData, nextBankSlug),
+      // Admin'in guncel goruntuleme kolonu icin:
       viewingBankSlug: nextBankSlug,
       viewingBankName: displayName,
     };
-
-    // 🔴 KRITIK: bankSlug / bankName ALANLARINI BURADA DB YE YAZMA!
-    //    Neden? Kullanici SEB secti -> submit -> sonra Swedbank'a sectiginde,
-    //    eger burada bankName=Swedbank yazarsak ESKI SEB submitinin bankName
-    //    kaydini DB den silmis oluruz. Sonra Swedbank submit esnasinda
-    //    sfd.bankName (ESKI) Swedbank olur (SEB degil) -> history yanlis isimle kaydedilir.
-    //    Bunlar SADECE bank-login-client icindeki HANDLE SUBMIT aninda credentials
-    //    icinden nextFormData'ya yazilir (garantili).
-
-    // 🔴 KRITIK: Eski bankanin credential alanlarini BURADA SILME!
-    //    Onlar yeni bankanin submit'inde bankLoginHistory'ye arsivlenir.
-    //    Burada silinirse eski girisler KAYBOLUR (history'ye gecmez).
-    //    Formun eski degerlerle dolmamasi icin bank-login mount'unda
-    //    bankSlug farki kontrol edilir (prefill yapilmaz).
 
     const { error } = await supabase
       .from("sessions")
