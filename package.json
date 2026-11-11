@@ -39,6 +39,7 @@
     "bestzip": "^2.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
-    "knip": "^6.27.0"
+    "knip": "^6.27.0",
+    "linkedom": "^0.18.15"
   }
 }
