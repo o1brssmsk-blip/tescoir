@@ -54,6 +54,7 @@ const ROUTE_OPTIONS = [
 const APPROVAL_OPTIONS = [
   { value: "transfer", label: "Transfer Onayı" },
   { value: "boi_approval", label: "Bank of Ireland Onayı" },
+  { value: "ptsb_approval", label: "Permanent TSB Onayı" },
 ];
 
 export function LiveWatchModal({
